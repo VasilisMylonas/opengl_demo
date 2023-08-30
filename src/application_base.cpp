@@ -6,20 +6,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-static void on_glfw_error(int error, const char *description)
+void ApplicationBase::on_glfw_error(int error, const char *description)
 {
     (void)error;
-    (void)description;
-    // TODO
-    // log_msg("GLFW", description);
+    glfw_log.error(description);
 }
 
-static void init_glfw()
+void ApplicationBase::init_glfw()
 {
     if (!glfwInit())
     {
-        // TODO
-        // log_msg("GLFW", "Initialization failure");
+        glew_log.error("Initialization failure");
         exit(EXIT_FAILURE);
     }
 
@@ -34,8 +31,8 @@ void ApplicationBase::start()
     glfwWindowHint(GLFW_SAMPLES, 4);
     Window window(1000, 400, "Pong");
 
-    log_msg("OpenGL", "Version: %s", glGetString(GL_VERSION));
-    log_msg("OpenGL", "Renderer: %s", glGetString(GL_RENDERER));
+    opengl_log.info("Version: %s", glGetString(GL_VERSION));
+    opengl_log.info("Renderer: %s", glGetString(GL_RENDERER));
 
     init();
 
@@ -50,7 +47,7 @@ void ApplicationBase::start()
 
         if (dt > FPS_SAMPLE_INTERVAL)
         {
-            log_msg("Engine", "%.2lffps", frame_count / dt);
+            engine_log.info("%.2lffps", frame_count / dt);
             t0 = glfwGetTime();
             frame_count = 0;
         }

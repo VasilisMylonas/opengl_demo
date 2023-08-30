@@ -7,7 +7,12 @@
 class ApplicationBase
 {
 private:
-    static const Logger log_msg;
+    static void on_glfw_error(int error, const char *description);
+    static void init_glfw();
+    static inline const Logger<std::clog> glfw_log{"GLFW"};
+    static inline const Logger<std::clog> glew_log{"GLEW"};
+    static inline const Logger<std::clog> opengl_log{"OpenGL"};
+    static inline const Logger<std::clog> engine_log{"Engine"};
 
 public:
     void start();
@@ -15,6 +20,3 @@ public:
     virtual void init() = 0;
     virtual void render() = 0;
 };
-
-// TODO:
-const Logger ApplicationBase::log_msg{std::clog};
