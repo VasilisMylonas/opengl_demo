@@ -32,11 +32,6 @@ public:
     LOG_FUNCTION(trace)
 
 #undef LOG_FUNCTION
-    // void error(const char *format, ...);
-    // void warn(const char *format, ...);
-    // void info(const char *format, ...);
-    // void debug(const char *format, ...);
-    // void trace(const char *format, ...);
 
     void operator()(const char *level, const char *format, std::va_list args) const
     {
