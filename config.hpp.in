@@ -1,0 +1,8 @@
+#pragma once
+
+// clang-format off
+
+static const char* const vertex_shader = R"""(@VS@)""";
+static const char* const fragment_shader = R"""(@FS@)""";
+
+#define FPS_SAMPLE_INTERVAL 0.5
