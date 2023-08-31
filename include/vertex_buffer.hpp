@@ -1,15 +1,16 @@
 #pragma once
 
 #include "opengl_object.hpp"
+#include "vertex.hpp"
 
 class VertexBuffer : public OpenGLObject
 {
 public:
-    VertexBuffer(std::size_t size, const void *data)
+    VertexBuffer(std::size_t count, const Vertex *data)
     {
         glGenBuffers(1, &handle_);
         bind();
-        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), data, GL_STATIC_DRAW);
         unbind();
     }
 
