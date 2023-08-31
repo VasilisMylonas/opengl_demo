@@ -8,6 +8,7 @@
 #include "vertex_buffer.hpp"
 #include "vertex_array.hpp"
 #include "application_base.hpp"
+#include "renderer.hpp"
 
 // std::string load_file(const char *path)
 // {
@@ -27,6 +28,7 @@
 
 class Application : public ApplicationBase
 {
+private:
     Vertex points[3] = {
         {
             0.0f,
@@ -48,21 +50,19 @@ class Application : public ApplicationBase
     std::unique_ptr<VertexBuffer> vbo;
     std::unique_ptr<VertexArray> vao;
 
-public:
+protected:
     virtual void init() override
     {
         vbo = std::make_unique<VertexBuffer>(3 * sizeof(Vertex), points);
         vao = std::make_unique<VertexArray>(*vbo);
 
         Shader shader(fragment_shader, vertex_shader);
-        glUseProgram(shader.handle());
+        Renderer::use_shader(shader);
     }
 
     virtual void render() override
     {
-        vao->bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        vao->unbind();
+        Renderer::draw(*vao, 0, 3);
     }
 };
 
@@ -70,6 +70,4 @@ int main()
 {
     Application app;
     app.start();
-
-    // glfwSwapInterval(0); Turns off vsync
 }

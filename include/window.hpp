@@ -2,14 +2,11 @@
 
 #include <utility>
 
-typedef struct GLFWwindow GLFWwindow;
-
 class Window
 {
 private:
+    typedef struct GLFWwindow GLFWwindow;
     GLFWwindow *handle_;
-
-    static Window *get_wrapper(GLFWwindow *handle);
 
 public:
     std::pair<int, int> size() const;
@@ -20,6 +17,7 @@ public:
     void close();
     void swap_buffers();
     void make_current();
+    void swap_interval(int interval);
 
     Window(int width, int height, const char *title);
     Window(const Window &) = delete;

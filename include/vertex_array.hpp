@@ -26,12 +26,12 @@ public:
         glDeleteVertexArrays(1, &handle_);
     }
 
-    void bind()
+    void bind() const
     {
         glBindVertexArray(handle_);
     }
 
-    void unbind()
+    void unbind() const
     {
         glBindVertexArray(0);
     }

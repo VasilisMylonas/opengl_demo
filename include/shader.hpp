@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "opengl_object.hpp"
 
 class Shader : public OpenGLObject

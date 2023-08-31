@@ -29,7 +29,7 @@ void ApplicationBase::start()
     init_glfw();
 
     glfwWindowHint(GLFW_SAMPLES, 4);
-    Window window(1000, 400, "Pong");
+    Window window{1000, 400, "Pong"};
 
     opengl_log.info("Version: %s", glGetString(GL_VERSION));
     opengl_log.info("Renderer: %s", glGetString(GL_RENDERER));

@@ -3,10 +3,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-Window *Window::get_wrapper(GLFWwindow *handle)
-{
-    return static_cast<Window *>(glfwGetWindowUserPointer(handle));
-}
+// static Window *get_wrapper(GLFWwindow *handle)
+// {
+//     return static_cast<Window *>(glfwGetWindowUserPointer(handle));
+// }
 
 static void on_resize_internal(GLFWwindow *window, int width, int height)
 {
@@ -101,4 +101,12 @@ void Window::make_current()
 bool Window::current() const
 {
     return glfwGetCurrentContext() == handle_;
+}
+
+void Window::swap_interval(int interval)
+{
+    auto previous = glfwGetCurrentContext();
+    make_current();
+    glfwSwapInterval(interval);
+    glfwMakeContextCurrent(previous);
 }
