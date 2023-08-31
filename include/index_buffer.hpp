@@ -7,7 +7,7 @@ class IndexBuffer : public OpenGLObject
 public:
     IndexBuffer(std::size_t count, const int *data)
     {
-        glGenBuffers(GL_ELEMENT_ARRAY_BUFFER, &handle_);
+        glGenBuffers(1, &handle_);
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(int), data, GL_STATIC_DRAW);
         unbind();
