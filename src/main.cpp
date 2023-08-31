@@ -1,10 +1,12 @@
 #include <iostream>
 #include <cstdlib>
-#include <sys/stat.h>
+#include <memory>
 
 #include "config.hpp"
-#include "vertex.hpp"
 #include "shader.hpp"
+#include "vertex.hpp"
+#include "vertex_buffer.hpp"
+#include "vertex_array.hpp"
 #include "application_base.hpp"
 
 // std::string load_file(const char *path)
@@ -25,10 +27,7 @@
 
 class Application : public ApplicationBase
 {
-    GLuint vbo = 0;
-    GLuint vao = 0;
-
-    Point points[3] = {
+    Vertex points[3] = {
         {
             0.0f,
             0.5f,
@@ -46,17 +45,14 @@ class Application : public ApplicationBase
         },
     };
 
+    std::unique_ptr<VertexBuffer> vbo;
+    std::unique_ptr<VertexArray> vao;
+
+public:
     virtual void init() override
     {
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), points, GL_STATIC_DRAW);
-
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        vbo = std::make_unique<VertexBuffer>(3 * sizeof(Vertex), points);
+        vao = std::make_unique<VertexArray>(*vbo);
 
         Shader shader(fragment_shader, vertex_shader);
         glUseProgram(shader.handle());
@@ -64,8 +60,9 @@ class Application : public ApplicationBase
 
     virtual void render() override
     {
-        glBindVertexArray(vao);
+        vao->bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        vao->unbind();
     }
 };
 

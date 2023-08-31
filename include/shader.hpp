@@ -1,10 +1,9 @@
 #pragma once
 
 #include <string>
+#include "opengl_object.hpp"
 
-#include "GL/glew.h"
-
-class Shader
+class Shader : public OpenGLObject
 {
 public:
     Shader(const std::string &fragment_source, const std::string &vertex_source)
@@ -18,9 +17,18 @@ public:
         glLinkProgram(handle_);
     }
 
-    GLuint handle() const
+    ~Shader()
     {
-        return handle_;
+        glDeleteShader(handle_);
+    }
+
+    bool valid()
+    {
+        glValidateProgram(handle_);
+
+        int status;
+        glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status);
+        return static_cast<bool>(status);
     }
 
 private:
@@ -31,6 +39,4 @@ private:
         glCompileShader(id);
         return id;
     }
-
-    GLuint handle_;
 };
