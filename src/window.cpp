@@ -24,6 +24,9 @@ Window::Window(int width, int height, const char *title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // TODO: anti-aliasing
+    glfwWindowHint(GLFW_SAMPLES, 16);
+
     handle_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!handle_)
     {

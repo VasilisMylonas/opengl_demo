@@ -1,30 +1,11 @@
 #pragma once
 
-#include "opengl_object.hpp"
+#include "opengl_buffer.hpp"
 
-class IndexBuffer : public OpenGLObject
+class IndexBuffer : public OpenGLBuffer<unsigned int, GL_ELEMENT_ARRAY_BUFFER>
 {
 public:
-    IndexBuffer(std::size_t count, const int *data)
+    IndexBuffer(std::size_t count, const unsigned int *data) : OpenGLBuffer(count, data)
     {
-        glGenBuffers(1, &handle_);
-        bind();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(int), data, GL_STATIC_DRAW);
-        unbind();
-    }
-
-    ~IndexBuffer()
-    {
-        glDeleteBuffers(1, &handle_);
-    }
-
-    void bind() const
-    {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle_);
-    }
-
-    void unbind() const
-    {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 };
