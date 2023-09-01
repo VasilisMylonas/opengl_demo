@@ -10,25 +10,16 @@
 #include "application_base.hpp"
 #include "renderer.hpp"
 
-// std::string load_file(const char *path)
-// {
-//     FILE *f = fopen(path, "rb");
-
-//     struct stat st;
-//     fstat(fileno(f), &st);
-
-//     std::string contents;
-//     contents.resize(st.st_size);
-
-//     fread(contents.data(), sizeof(char), st.st_size, f);
-//     fclose(f);
-
-//     return contents;
-// }
-
 class Application : public ApplicationBase
 {
 private:
+    std::unique_ptr<VertexBuffer> vbo;
+    std::unique_ptr<IndexBuffer> ibo;
+    std::unique_ptr<VertexArray> vao;
+    int frame_count = 0;
+    Timer fps_timer{};
+    Timer timer{};
+
     Vertex points[3] = {
         {
             0.0f,
@@ -47,27 +38,67 @@ private:
         },
     };
 
-    std::unique_ptr<VertexBuffer> vbo;
-    std::unique_ptr<VertexArray> vao;
-
 protected:
-    virtual void init() override
+    virtual Window init() override
     {
-        vbo = std::make_unique<VertexBuffer>(3 * sizeof(Vertex), points);
-        vao = std::make_unique<VertexArray>(*vbo);
+        Window window{1000, 400, name().c_str()};
+        window.make_current();
 
-        Shader shader(fragment_shader, vertex_shader);
+        Shader shader{fragment_shader, vertex_shader};
         Renderer::use_shader(shader);
+
+        unsigned indices[] = {
+            0,
+            1,
+            1,
+            2,
+            2,
+            0,
+        };
+
+        vbo = std::make_unique<VertexBuffer>(3, points);
+        ibo = std::make_unique<IndexBuffer>(6, indices);
+        vao = std::make_unique<VertexArray>(*vbo, *ibo);
+
+        return window;
     }
 
     virtual void render() override
     {
-        Renderer::draw(*vao, 0, 3);
+        double dt = fps_timer.delta();
+
+        if (dt > FPS_SAMPLE_INTERVAL)
+        {
+            logger().info("%.2lffps", frame_count / dt);
+
+            frame_count = 0;
+        }
+
+        dt = timer.delta();
+
+        if (dt > 1)
+        {
+            timer.reset();
+            points[0].x_++;
+            if (points[0].x_ > 3)
+            {
+                points[0].x_ = -3;
+            }
+        }
+
+        vbo->update_data(0, 3, points);
+        Renderer::draw(*vao, 6);
+        frame_count++;
+    }
+
+public:
+    Application() : ApplicationBase("Pong")
+    {
     }
 };
 
-int main()
+int main(int argc, const char *argv[])
 {
     Application app;
-    app.start();
+    app.start(argc, argv);
 }

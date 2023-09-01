@@ -33,7 +33,7 @@ public:
     }
 
 private:
-    GLuint create_shader(GLuint type, std::string_view source) const
+    static GLuint create_shader(GLuint type, std::string_view source)
     {
         const char *source_array[1] = {source.data()};
         GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};

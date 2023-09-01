@@ -30,7 +30,7 @@ public:
         vbo.bind();
         ibo.bind();
 
-        // See Vertex.hpp
+        // see vertex.hpp
         glEnableVertexArrayAttrib(handle_, 0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 

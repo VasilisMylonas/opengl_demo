@@ -2,6 +2,8 @@
 
 #include "logger.hpp"
 #include "timer.hpp"
+#include "window.hpp"
+#include "shader.hpp"
 
 #include <string>
 #include <string_view>
@@ -10,21 +12,19 @@
 class ApplicationBase
 {
 private:
-    static void on_glfw_error(int error, const char *description);
-    static void init_glfw();
-    static inline const Logger glfw_log{std::clog, "GLFW"};
-    static inline const Logger glew_log{std::clog, "GLEW"};
-    static inline const Logger opengl_log{std::clog, "OpenGL"};
-    static inline const Logger engine_log{std::clog, "Engine"};
-
     std::string name_;
+    Logger logger_;
+
+    static void on_glfw_error(int error, const char *description);
 
 protected:
-    const Logger &logger() const;
-    virtual void init() = 0;
-    virtual void render(Timer &timer) = 0;
+    virtual Window init() = 0;
+    virtual void render() = 0;
 
 public:
     ApplicationBase(std::string_view name);
-    void start();
+    virtual ~ApplicationBase();
+    void start(int argc, const char *argv[]);
+    const std::string &name() const;
+    const Logger &logger() const;
 };

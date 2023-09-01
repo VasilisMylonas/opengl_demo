@@ -33,15 +33,6 @@ Window::Window(int width, int height, const char *title)
         // TODO: throw
     }
 
-    glfwMakeContextCurrent(handle_);
-    glewExperimental = GL_TRUE;
-
-    auto code = glewInit();
-    if (code != GLEW_OK)
-    {
-        // TODO: throw
-    }
-
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
     on_resize_internal(handle_, width, height);
 }
@@ -99,6 +90,14 @@ void Window::swap_buffers()
 void Window::make_current()
 {
     glfwMakeContextCurrent(handle_);
+
+    glewExperimental = GL_TRUE;
+
+    auto code = glewInit();
+    if (code != GLEW_OK)
+    {
+        // TODO: throw
+    }
 }
 
 bool Window::current() const
