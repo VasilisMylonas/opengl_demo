@@ -70,13 +70,13 @@ protected:
         if (dt > FPS_SAMPLE_INTERVAL)
         {
             logger().info("%.2lffps", frame_count / dt);
-
             frame_count = 0;
+            fps_timer.reset();
         }
 
         dt = timer.delta();
 
-        if (dt > 1)
+        if (dt > 0.5)
         {
             timer.reset();
             points[0].x_++;
