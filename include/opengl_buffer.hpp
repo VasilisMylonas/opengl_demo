@@ -9,7 +9,9 @@ public:
     OpenGLBuffer(std::size_t count, const T *data)
     {
         glGenBuffers(1, &handle_);
-        set_data(count, data);
+        bind();
+        glBufferData(BufferKind, count * sizeof(T), data, GL_STATIC_DRAW);
+        unbind();
     }
 
     ~OpenGLBuffer()
@@ -17,10 +19,10 @@ public:
         glDeleteBuffers(1, &handle_);
     }
 
-    void set_data(std::size_t count, const T *data)
+    void update_data(std::size_t index, std::size_t count, const T *data)
     {
         bind();
-        glBufferData(BufferKind, count * sizeof(T), data, GL_STATIC_DRAW);
+        glBufferSubData(BufferKind, index * sizeof(T), count * sizeof(T), data);
         unbind();
     }
 
