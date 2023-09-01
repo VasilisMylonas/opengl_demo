@@ -8,6 +8,7 @@
 #include "vertex_buffer.hpp"
 #include "vertex_array.hpp"
 #include "application_base.hpp"
+#include "fps_counter.hpp"
 #include "renderer.hpp"
 
 class Application : public ApplicationBase
@@ -17,7 +18,7 @@ private:
     std::unique_ptr<IndexBuffer> ibo;
     std::unique_ptr<VertexArray> vao;
     int frame_count = 0;
-    Timer fps_timer{};
+    FpsCounter counter{};
     Timer timer{};
 
     Vertex points[3] = {
@@ -65,16 +66,9 @@ protected:
 
     virtual void render() override
     {
-        double dt = fps_timer.delta();
+        double dt = timer.delta();
 
-        if (dt > FPS_SAMPLE_INTERVAL)
-        {
-            logger().info("%.2lffps", frame_count / dt);
-            frame_count = 0;
-            fps_timer.reset();
-        }
-
-        dt = timer.delta();
+        logger().info("%.2lffps", counter.fps());
 
         if (dt > 0.5)
         {
@@ -88,7 +82,6 @@ protected:
 
         vbo->update_data(0, 3, points);
         Renderer::draw(*vao, 6);
-        frame_count++;
     }
 
 public:
