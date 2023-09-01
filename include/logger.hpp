@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ostream>
+#include <cstdarg>
+#include <string_view>
 
 class Logger
 {
@@ -23,4 +25,6 @@ public:
     void info(const char *format, ...) const;
     void warn(const char *format, ...) const;
     void error(const char *format, ...) const;
+
+    void output(std::string_view level, const char *format, std::va_list args) const;
 };
