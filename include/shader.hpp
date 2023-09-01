@@ -1,16 +1,16 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 #include "opengl_object.hpp"
 
 class Shader : public OpenGLObject
 {
 public:
-    Shader(const std::string &fragment_source, const std::string &vertex_source)
+    Shader(std::string_view fragment_source, std::string_view vertex_source)
     {
-        GLuint fs = create_shader(GL_FRAGMENT_SHADER, fragment_source.c_str());
-        GLuint vs = create_shader(GL_VERTEX_SHADER, vertex_source.c_str());
+        GLuint fs = create_shader(GL_FRAGMENT_SHADER, fragment_source);
+        GLuint vs = create_shader(GL_VERTEX_SHADER, vertex_source);
 
         handle_ = glCreateProgram();
         glAttachShader(handle_, fs);
@@ -33,10 +33,13 @@ public:
     }
 
 private:
-    GLuint create_shader(GLuint type, const char *source) const
+    GLuint create_shader(GLuint type, std::string_view source) const
     {
+        const char *source_array[1] = {source.data()};
+        GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};
+
         GLuint id = glCreateShader(type);
-        glShaderSource(id, 1, &source, nullptr);
+        glShaderSource(id, 1, source_array, length_array);
         glCompileShader(id);
         return id;
     }

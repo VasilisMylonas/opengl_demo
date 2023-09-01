@@ -10,7 +10,7 @@ public:
     {
         glGenBuffers(1, &handle_);
         bind();
-        glBufferData(BufferKind, count * sizeof(T), data, GL_STATIC_DRAW);
+        glBufferData(BufferKind, count * sizeof(T), data, GL_STATIC_DRAW); // TODO: what about GL_DYNAMIC_DRAW
         unbind();
     }
 
