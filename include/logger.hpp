@@ -7,11 +7,11 @@
 class Logger
 {
 private:
-    const char *source_;
+    std::string_view source_;
     std::ostream &stream_;
 
 public:
-    Logger(std::ostream &stream, const char *source) : source_{source}, stream_{stream}
+    Logger(std::ostream &stream, std::string_view source) : source_{source}, stream_{stream}
     {
     }
 
