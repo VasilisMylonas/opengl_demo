@@ -2,6 +2,11 @@
 
 #include <GLFW/glfw3.h>
 
+Timer::Timer()
+{
+    reset();
+}
+
 double Timer::delta() const
 {
     return glfwGetTime() - t0_;

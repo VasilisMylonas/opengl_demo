@@ -4,7 +4,9 @@ project(notagame CXX)
 file(READ shaders/shader.fs FS)
 file(READ shaders/shader.vs VS)
 
-add_executable(notagame src/main.cpp src/window.cpp src/application_base.cpp src/logger.cpp src/timer.cpp)
+file(GLOB SRC src/*.cpp )
+
+add_executable(notagame ${SRC})
 target_include_directories(notagame PUBLIC include)
 target_link_libraries(notagame PUBLIC glfw GL GLEW)
 target_include_directories(notagame PUBLIC ${CMAKE_BINARY_DIR})

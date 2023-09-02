@@ -32,3 +32,12 @@ LOG_FUNCTION(debug)
 LOG_FUNCTION(trace)
 
 #undef LOG_FUNCTION
+
+Logger::Logger(std::ostream &stream, std::string_view source) : source_{source}, stream_{stream}
+{
+}
+
+Logger::~Logger()
+{
+    stream_ << std::flush;
+}

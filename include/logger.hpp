@@ -11,14 +11,8 @@ private:
     std::ostream &stream_;
 
 public:
-    Logger(std::ostream &stream, std::string_view source) : source_{source}, stream_{stream}
-    {
-    }
-
-    ~Logger()
-    {
-        stream_ << std::flush;
-    }
+    Logger(std::ostream &stream, std::string_view source);
+    ~Logger();
 
     void trace(const char *format, ...) const;
     void debug(const char *format, ...) const;

@@ -6,7 +6,7 @@ private:
     double t0_;
 
 public:
-    Timer() { reset(); }
+    Timer();
     double delta() const;
     void reset();
 };
