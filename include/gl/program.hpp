@@ -32,6 +32,11 @@ namespace gl
             return *this;
         }
 
+        Program &detach(const Shader &shader)
+        {
+            GL_CALL(glDetachShader(handle_, shader.handle()));
+        }
+
         Program &link()
         {
             GL_CALL(glLinkProgram(handle_));

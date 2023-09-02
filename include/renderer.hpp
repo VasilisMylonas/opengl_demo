@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gl/buffer.hpp"
 #include "gl/vertex_array.hpp"
 
 class Renderer
@@ -13,7 +14,7 @@ public:
         vao.unbind();
     }
 
-    static void draw(const gl::VertexArray &vao, std::size_t first, std::size_t count)
+    static void draw_arrays(const gl::VertexArray &vao, std::size_t first, std::size_t count)
     {
         vao.bind();
         glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count));

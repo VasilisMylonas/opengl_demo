@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(notagame CXX)
 
-file(READ shaders/fs.glsl FS)
-file(READ shaders/vs.glsl VS)
+file(READ shaders/shader.fs FS)
+file(READ shaders/shader.vs VS)
 
 add_executable(notagame src/main.cpp src/window.cpp src/application_base.cpp src/logger.cpp src/timer.cpp)
 target_include_directories(notagame PUBLIC include)

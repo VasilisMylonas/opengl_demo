@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gl/buffer.hpp"
+#include "gl/vertex_layout.hpp"
 
 namespace gl
 {
@@ -17,46 +18,41 @@ namespace gl
             GL_CALL(glDeleteVertexArrays(1, &handle_));
         }
 
-        // VertexArray(const Buffer &vbo, const VertexLayout &layout) : VertexArray()
-        // {
-        //     set_buffer(vbo, layout);
-        // }
+        void set_buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
+        {
+            bind();
+            ibo.bind();
+            set_buffer(vbo, layout);
+            unbind();
+            ibo.unbind();
+        }
 
-        // void set_buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
-        // {
-        //     bind();
-        //     ibo.bind();
-        //     set_buffer(vbo, layout);
-        //     unbind();
-        //     ibo.unbind();
-        // }
+        void set_buffer(const Buffer &vbo, const VertexLayout &layout)
+        {
+            bind();
+            vbo.bind();
 
-        // void set_buffer(const Buffer &vbo, const VertexLayout &layout)
-        // {
-        //     bind();
-        //     vbo.bind();
+            const auto &attr = layout.attributes();
+            auto stride = static_cast<GLuint>(layout.stride());
+            std::size_t offset = 0;
 
-        //     const auto &attr = layout.attributes();
-        //     auto stride = static_cast<GLuint>(layout.stride());
-        //     std::size_t offset = 0;
+            for (std::size_t i = 0; i < attr.size(); i++)
+            {
+                auto index = static_cast<GLuint>(i);
+                GL_CALL(glEnableVertexArrayAttrib(handle_, index));
+                GL_CALL(glVertexAttribPointer(
+                    index,
+                    attr[i].count,
+                    attr[i].type,
+                    attr[i].normalized,
+                    stride,
+                    reinterpret_cast<void *>(offset)));
+                offset += attr[i].count * attr[i].size;
+            }
 
-        //     for (std::size_t i = 0; i < attr.size(); i++)
-        //     {
-        //         auto index = static_cast<GLuint>(i);
-        //         glEnableVertexArrayAttrib(handle_, index);
-        //         glVertexAttribPointer(
-        //             index,
-        //             attr[i].count,
-        //             attr[i].type,
-        //             attr[i].normalized,
-        //             stride,
-        //             reinterpret_cast<void *>(offset));
-        //         offset += attr[i].count * attr[i].size;
-        //     }
-
-        //     vbo.unbind();
-        //     unbind();
-        // }
+            vbo.unbind();
+            unbind();
+        }
 
         void bind() const
         {
