@@ -2,45 +2,43 @@
 
 #include <string_view>
 
-#include "opengl_object.hpp"
+#include "object.hpp"
 
-class Shader : public OpenGLObject
+namespace gl
 {
-public:
-    Shader(std::string_view fragment_source, std::string_view vertex_source)
+    class Shader : public Object
     {
-        GLuint fs = create_shader(GL_FRAGMENT_SHADER, fragment_source);
-        GLuint vs = create_shader(GL_VERTEX_SHADER, vertex_source);
+    public:
+        enum class Type
+        {
+            FRAGMENT = GL_FRAGMENT_SHADER,
+            VERTEX = GL_VERTEX_SHADER,
+        };
 
-        handle_ = glCreateProgram();
-        glAttachShader(handle_, fs);
-        glAttachShader(handle_, vs);
-        glLinkProgram(handle_);
-    }
+        Shader(Type type)
+        {
+            GL_CALL(handle_ = glCreateShader(static_cast<GLenum>(type)));
+        }
 
-    ~Shader()
-    {
-        glDeleteShader(handle_);
-    }
+        ~Shader()
+        {
+            glDeleteShader(handle_);
+        }
 
-    bool valid()
-    {
-        glValidateProgram(handle_);
+        // TODO: source() const
 
-        int status;
-        glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status);
-        return static_cast<bool>(status);
-    }
+        Shader &set_source(std::string_view source)
+        {
+            const char *source_array[1] = {source.data()};
+            GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};
+            GL_CALL(glShaderSource(handle_, 1, source_array, length_array));
+            return *this;
+        }
 
-private:
-    static GLuint create_shader(GLuint type, std::string_view source)
-    {
-        const char *source_array[1] = {source.data()};
-        GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};
-
-        GLuint id = glCreateShader(type);
-        glShaderSource(id, 1, source_array, length_array);
-        glCompileShader(id);
-        return id;
-    }
-};
+        Shader &compile()
+        {
+            GL_CALL(glCompileShader(handle_));
+            return *this;
+        }
+    };
+} // namespace gl

@@ -1,42 +1,55 @@
 #include <iostream>
-#include <cstdlib>
 #include <memory>
+#include <array>
 
 #include "config.hpp"
 #include "shader.hpp"
+#include "program.hpp"
 #include "vertex.hpp"
-#include "vertex_buffer.hpp"
+#include "buffer.hpp"
 #include "vertex_array.hpp"
 #include "application_base.hpp"
 #include "fps_counter.hpp"
 #include "renderer.hpp"
 
+using namespace gl;
+
 class Application : public ApplicationBase
 {
 private:
-    std::unique_ptr<VertexBuffer> vbo;
-    std::unique_ptr<IndexBuffer> ibo;
-    std::unique_ptr<VertexArray> vao;
-    int frame_count = 0;
+    std::unique_ptr<Buffer> vbo;
+    std::unique_ptr<Buffer> ibo;
+    // std::unique_ptr<VertexArray> vao;
+    // std::unique_ptr<VertexLayout> layout;
+
     FpsCounter counter{};
     Timer timer{};
 
-    Vertex points[3] = {
-        {
+    std::array<Vertex, 3> points = {
+        Vertex{
             0.0f,
             0.5f,
             0.0f,
         },
-        {
+        Vertex{
             0.5f,
             -0.5f,
             0.0f,
         },
-        {
+        Vertex{
             -0.5f,
             -0.5f,
             0.0f,
         },
+    };
+
+    std::array<unsigned int, 6> indices = {
+        0,
+        1,
+        1,
+        2,
+        2,
+        0,
     };
 
 protected:
@@ -45,43 +58,57 @@ protected:
         Window window{1000, 400, name().c_str()};
         window.make_current();
 
-        Shader shader{fragment_shader, vertex_shader};
-        Renderer::use_shader(shader);
+        Shader fs{Shader::Type::FRAGMENT};
+        Shader vs{Shader::Type::VERTEX};
+        fs.set_source(fragment_shader).compile();
+        vs.set_source(vertex_shader).compile();
 
-        unsigned indices[] = {
-            0,
-            1,
-            1,
-            2,
-            2,
-            0,
-        };
+        Program program{};
+        program.attach(fs).attach(vs).link().use();
 
-        vbo = std::make_unique<VertexBuffer>(3, points);
-        ibo = std::make_unique<IndexBuffer>(6, indices);
-        vao = std::make_unique<VertexArray>(*vbo, *ibo);
+        vbo = std::make_unique<Buffer>(points.size(), points.data(), Buffer::Target::Vertex);
+        // ISSUE is here
+        // ibo = std::make_unique<Buffer>(indices.size(), indices.data(), Buffer::Target::Index);
+        // layout = std::make_unique<VertexLayout>();
+        // layout->push<float>(3, false);
+        // vao = std::make_unique<VertexArray>(*vbo, *layout);
 
         return window;
     }
 
     virtual void render() override
     {
-        double dt = timer.delta();
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+
+        glBindVertexArray(vao);
+
+        vbo->bind();
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // double dt = timer.delta();
 
         logger().info("%.2lffps", counter.fps());
 
-        if (dt > 0.5)
-        {
-            timer.reset();
-            points[0].x_++;
-            if (points[0].x_ > 3)
-            {
-                points[0].x_ = -3;
-            }
-        }
+        // if (dt > 0.5)
+        // {
+        //     timer.reset();
+        //     points[0].x++;
+        //     if (points[0].x > 3)
+        //     {
+        //         points[0].x = -3;
+        //     }
+        // }
 
-        vbo->update_data(0, 3, points);
-        Renderer::draw(*vao, 6);
+        // ibo->bind();
+        // Renderer::draw_elements(*vao, 3);
+        // ibo->unbind();
+
+        // vbo->set_data(0, 3 * sizeof(Vertex), points);
+        // Renderer::draw(*vao, 0, 3);
     }
 
 public:

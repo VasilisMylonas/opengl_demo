@@ -1,56 +1,73 @@
 #pragma once
 
-#include "opengl_object.hpp"
-#include "vertex_buffer.hpp"
-#include "index_buffer.hpp"
+#include "buffer.hpp"
+#include "vertex_layout.hpp"
 
-class VertexArray : public OpenGLObject
+namespace gl
 {
-public:
-    VertexArray(const VertexBuffer &vbo)
+    class VertexArray : public Object
     {
-        glGenVertexArrays(1, &handle_);
+    public:
+        VertexArray()
+        {
+            GL_CALL(glGenVertexArrays(1, &handle_));
+        }
 
-        bind();
-        vbo.bind();
+        // VertexArray(const Buffer &vbo, const VertexLayout &layout) : VertexArray()
+        // {
+        //     set_buffer(vbo, layout);
+        // }
 
-        // see vertex.hpp
-        glEnableVertexArrayAttrib(handle_, 0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        // void set_buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
+        // {
+        //     bind();
+        //     ibo.bind();
+        //     set_buffer(vbo, layout);
+        //     unbind();
+        //     ibo.unbind();
+        // }
 
-        unbind();
-        vbo.unbind();
-    }
+        // void set_buffer(const Buffer &vbo, const VertexLayout &layout)
+        // {
+        //     bind();
+        //     vbo.bind();
 
-    VertexArray(const VertexBuffer &vbo, const IndexBuffer &ibo)
-    {
-        glGenVertexArrays(1, &handle_);
+        //     const auto &attr = layout.attributes();
+        //     auto stride = static_cast<GLuint>(layout.stride());
+        //     std::size_t offset = 0;
 
-        bind();
-        vbo.bind();
-        ibo.bind();
+        //     for (std::size_t i = 0; i < attr.size(); i++)
+        //     {
+        //         auto index = static_cast<GLuint>(i);
+        //         glEnableVertexArrayAttrib(handle_, index);
+        //         glVertexAttribPointer(
+        //             index,
+        //             attr[i].count,
+        //             attr[i].type,
+        //             attr[i].normalized,
+        //             stride,
+        //             reinterpret_cast<void *>(offset));
+        //         offset += attr[i].count * attr[i].size;
+        //     }
 
-        // see vertex.hpp
-        glEnableVertexArrayAttrib(handle_, 0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        //     vbo.unbind();
+        //     unbind();
+        // }
 
-        unbind();
-        vbo.unbind();
-        ibo.unbind();
-    }
+        ~VertexArray()
+        {
+            GL_CALL(glDeleteVertexArrays(1, &handle_));
+        }
 
-    ~VertexArray()
-    {
-        glDeleteVertexArrays(1, &handle_);
-    }
+        void bind() const
+        {
+            GL_CALL(glBindVertexArray(handle_));
+        }
 
-    void bind() const
-    {
-        glBindVertexArray(handle_);
-    }
+        void unbind() const
+        {
+            GL_CALL(glBindVertexArray(0));
+        }
+    };
 
-    void unbind() const
-    {
-        glBindVertexArray(0);
-    }
-};
+} // namespace gl
