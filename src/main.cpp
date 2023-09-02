@@ -61,19 +61,24 @@ protected:
 
         Shader fs{Shader::Type::FRAGMENT};
         Shader vs{Shader::Type::VERTEX};
-        fs.set_source(fragment_shader).compile();
-        vs.set_source(vertex_shader).compile();
+        fs.source(fragment_shader).compile();
+        vs.source(vertex_shader).compile();
 
         Program program{};
-        program.attach(fs).attach(vs).link().use();
+        program.attach(fs).attach(vs).link().use().detach(fs).detach(vs);
 
-        vbo = std::make_unique<Buffer>(points.size() * sizeof(glm::vec3), points.data(), Buffer::Target::Vertex, Buffer::Usage::DYNAMIC_DRAW);
+        vbo = std::make_unique<Buffer>();
+        vbo->target(Buffer::Target::Array)
+            .usage(Buffer::Usage::DYNAMIC_DRAW)
+            .size(points.size() * sizeof(glm::vec3))
+            .data(points.data());
+
         // ibo = std::make_unique<Buffer>(indices.size() * sizeof(unsigned int), indices.data(), Buffer::Target::Index, Buffer::Usage::DYNAMIC_DRAW);
         layout = std::make_unique<VertexLayout>();
         layout->attribute<float>(3, false);
 
         vao = std::make_unique<VertexArray>();
-        vao->set_buffer(*vbo, *layout);
+        vao->buffer(*vbo, *layout);
 
         return window;
     }
@@ -90,7 +95,7 @@ protected:
             points[2] = points[2] * r;
         }
 
-        vbo->set_data(0, points.size() * sizeof(glm::vec3), points.data());
+        vbo->update(0, points.size() * sizeof(glm::vec3), points.data());
         Renderer::draw_arrays(*vao, 0, 3);
     }
 

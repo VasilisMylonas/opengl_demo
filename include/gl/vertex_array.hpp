@@ -18,16 +18,17 @@ namespace gl
             GL_CALL(glDeleteVertexArrays(1, &handle_));
         }
 
-        void set_buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
+        VertexArray &buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
         {
             bind();
             ibo.bind();
-            set_buffer(vbo, layout);
+            buffer(vbo, layout);
             unbind();
             ibo.unbind();
+            return *this;
         }
 
-        void set_buffer(const Buffer &vbo, const VertexLayout &layout)
+        VertexArray &buffer(const Buffer &vbo, const VertexLayout &layout)
         {
             bind();
             vbo.bind();
@@ -52,16 +53,31 @@ namespace gl
 
             vbo.unbind();
             unbind();
+            return *this;
         }
 
-        void bind() const
+        VertexArray &bind()
         {
             GL_CALL(glBindVertexArray(handle_));
+            return *this;
         }
 
-        void unbind() const
+        VertexArray &unbind()
         {
             GL_CALL(glBindVertexArray(0));
+            return *this;
+        }
+
+        const VertexArray &bind() const
+        {
+            GL_CALL(glBindVertexArray(handle_));
+            return *this;
+        }
+
+        const VertexArray &unbind() const
+        {
+            GL_CALL(glBindVertexArray(0));
+            return *this;
         }
     };
 

@@ -25,9 +25,21 @@ namespace gl
             glDeleteShader(handle_);
         }
 
-        // TODO: source() const
+        std::string source() const
+        {
+            GLint param;
+            GL_CALL(glGetShaderiv(handle_, GL_SHADER_SOURCE_LENGTH, &param));
 
-        Shader &set_source(std::string_view source)
+            auto size = static_cast<GLsizei>(param);
+
+            std::string src{};
+            src.resize(static_cast<std::size_t>(size + 1));
+            glGetShaderSource(handle_, size + 1, &size, src.data());
+            src.resize(static_cast<std::size_t>(size));
+            return src;
+        }
+
+        Shader &source(std::string_view source)
         {
             const char *source_array[1] = {source.data()};
             GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};

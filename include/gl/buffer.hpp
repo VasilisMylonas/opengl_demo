@@ -23,22 +23,13 @@ namespace gl
         enum class Target : GLenum
         {
             Index = GL_ELEMENT_ARRAY_BUFFER,
-            Vertex = GL_ARRAY_BUFFER,
+            Array = GL_ARRAY_BUFFER,
             Texture = GL_TEXTURE_BUFFER,
         };
 
-        Buffer(GLsizeiptr size, const void *data, Target target, Usage usage = Usage::STATIC_DRAW)
-            : target_{target}
+        Buffer()
         {
             GL_CALL(glGenBuffers(1, &handle_));
-
-            bind();
-            GL_CALL(glBufferData(
-                static_cast<GLenum>(target_),
-                static_cast<GLsizeiptr>(size),
-                data,
-                static_cast<GLenum>(usage)));
-            unbind();
         }
 
         ~Buffer()
@@ -46,38 +37,78 @@ namespace gl
             GL_CALL(glDeleteBuffers(1, &handle_));
         }
 
+        Buffer &size(std::size_t size)
+        {
+            size_ = size;
+            return *this;
+        }
+
+        std::size_t size() const
+        {
+            return size_;
+        }
+
+        Buffer &usage(Usage usage)
+        {
+            usage_ = usage;
+            return *this;
+        }
+
+        Usage usage() const
+        {
+            return usage_;
+        }
+
+        Buffer &target(Target target)
+        {
+            target_ = target;
+            return *this;
+        }
+
         Target target() const
         {
             return target_;
         }
 
-        void set_target(Target target)
-        {
-            target_ = target;
-        }
-
-        void bind() const
+        Buffer &bind()
         {
             GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));
+            return *this;
         }
 
-        void unbind() const
+        Buffer &unbind()
         {
             GL_CALL(glBindBuffer(static_cast<GLenum>(target_), 0));
+            return *this;
         }
 
-        void data(std::ptrdiff_t offset, std::size_t size, void *data) const
+        const Buffer &bind() const
+        {
+            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));
+            return *this;
+        }
+
+        const Buffer &unbind() const
+        {
+            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), 0));
+            return *this;
+        }
+
+        Buffer &data(const void *data)
         {
             bind();
-            GL_CALL(glGetBufferSubData(
+            GL_CALL(glBufferData(
                 static_cast<GLenum>(target_),
-                static_cast<GLintptr>(offset),
-                static_cast<GLsizeiptr>(size),
-                data));
+                static_cast<GLsizeiptr>(size_),
+                data,
+                static_cast<GLenum>(usage_)));
             unbind();
+            return *this;
         }
 
-        void set_data(std::ptrdiff_t offset, std::size_t size, const void *data)
+        // TODO: get buffer data?
+
+        Buffer &update(std::ptrdiff_t offset, std::size_t size, const void *data)
         {
             bind();
             glBufferSubData(
@@ -86,9 +117,12 @@ namespace gl
                 static_cast<GLsizeiptr>(size),
                 data);
             unbind();
+            return *this;
         }
 
     private:
-        Target target_;
+        std::size_t size_{0};
+        Usage usage_{Usage::STATIC_DRAW};
+        Target target_{Target::Array};
     };
 } // namespace gl

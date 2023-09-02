@@ -35,6 +35,7 @@ namespace gl
         Program &detach(const Shader &shader)
         {
             GL_CALL(glDetachShader(handle_, shader.handle()));
+            return *this;
         }
 
         Program &link()
@@ -43,9 +44,10 @@ namespace gl
             return *this;
         }
 
-        void use()
+        Program &use()
         {
             GL_CALL(glUseProgram(handle_));
+            return *this;
         }
     };
 } // namespace gl
