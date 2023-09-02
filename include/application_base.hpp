@@ -1,13 +1,10 @@
 #pragma once
 
 #include "logger.hpp"
-#include "timer.hpp"
 #include "window.hpp"
-#include "shader.hpp"
 
 #include <string>
 #include <string_view>
-#include <iostream>
 
 class ApplicationBase
 {

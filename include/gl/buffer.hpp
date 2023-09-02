@@ -1,7 +1,6 @@
 #pragma once
 
-#include "object.hpp"
-#include <cassert>
+#include "gl/object.hpp"
 
 namespace gl
 {

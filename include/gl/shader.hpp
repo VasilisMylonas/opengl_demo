@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-#include "object.hpp"
+#include "gl/object.hpp"
 
 namespace gl
 {

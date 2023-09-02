@@ -1,7 +1,6 @@
 #pragma once
 
-#include "buffer.hpp"
-#include "vertex_layout.hpp"
+#include "gl/buffer.hpp"
 
 namespace gl
 {
@@ -11,6 +10,11 @@ namespace gl
         VertexArray()
         {
             GL_CALL(glGenVertexArrays(1, &handle_));
+        }
+
+        ~VertexArray()
+        {
+            GL_CALL(glDeleteVertexArrays(1, &handle_));
         }
 
         // VertexArray(const Buffer &vbo, const VertexLayout &layout) : VertexArray()
@@ -53,11 +57,6 @@ namespace gl
         //     vbo.unbind();
         //     unbind();
         // }
-
-        ~VertexArray()
-        {
-            GL_CALL(glDeleteVertexArrays(1, &handle_));
-        }
 
         void bind() const
         {

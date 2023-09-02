@@ -1,7 +1,8 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <csignal>
+
+#include <cassert>
 #include <iostream>
 
 #define GL_CALL(function)                                                                     \
@@ -10,7 +11,7 @@
     {                                                                                         \
         std::cerr << "OpenGL error at " << __FILE__ << ":" << __LINE__ << " in "              \
                   << __func__ << "() " << _gl_error << std::endl;                             \
-        raise(SIGTRAP);                                                                       \
+        assert(false);                                                                        \
     }
 
 namespace gl

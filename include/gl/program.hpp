@@ -1,7 +1,6 @@
 #pragma once
 
-#include "object.hpp"
-#include "shader.hpp"
+#include "gl/shader.hpp"
 
 namespace gl
 {

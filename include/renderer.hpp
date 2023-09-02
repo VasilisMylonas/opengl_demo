@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vertex_array.hpp"
+#include "gl/vertex_array.hpp"
 
 class Renderer
 {

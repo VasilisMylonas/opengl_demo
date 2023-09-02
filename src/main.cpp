@@ -3,14 +3,16 @@
 #include <array>
 
 #include "config.hpp"
-#include "shader.hpp"
-#include "program.hpp"
+
 #include "vertex.hpp"
-#include "buffer.hpp"
-#include "vertex_array.hpp"
 #include "application_base.hpp"
 #include "fps_counter.hpp"
 #include "renderer.hpp"
+
+#include "gl/shader.hpp"
+#include "gl/program.hpp"
+#include "gl/buffer.hpp"
+#include "gl/vertex_array.hpp"
 
 using namespace gl;
 
@@ -78,16 +80,14 @@ protected:
 
     virtual void render() override
     {
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-
-        glBindVertexArray(vao);
+        VertexArray vao{};
+        vao.bind();
 
         vbo->bind();
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        GL_CALL(glEnableVertexAttribArray(0));
+        GL_CALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr));
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
 
         // double dt = timer.delta();
 
