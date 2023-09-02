@@ -49,6 +49,7 @@ void ApplicationBase::start(int argc, const char *argv[])
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     Window window = init();
+    window.make_current();
 
     logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
     logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
