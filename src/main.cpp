@@ -2,12 +2,14 @@
 #include <memory>
 #include <array>
 
-#include <glm/vec3.hpp>
-#include <glm/mat3x3.hpp>
+#include <glm/glm.hpp>
+#include <glm/matrix.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "config.hpp"
 
-#include "application_base.hpp"
+#include "application.hpp"
 #include "fps_counter.hpp"
 #include "renderer.hpp"
 
@@ -18,7 +20,7 @@
 
 using namespace gl;
 
-class Application : public ApplicationBase
+class App : public Application
 {
 private:
     std::unique_ptr<Buffer> vbo;
@@ -29,19 +31,15 @@ private:
     FpsCounter counter{};
     Timer timer{};
 
-    std::array<glm::vec3, 3> points = {
-        glm::vec3{0.0f, 0.5f, 0.0f},
-        glm::vec3{0.5f, -0.5f, 0.0f},
-        glm::vec3{-0.5f, -0.5f, 0.0f},
+    std::array<glm::vec4, 3> points = {
+        glm::vec4{0.0f, 0.5f, 0.0f, 1.0f},
+        glm::vec4{0.5f, -0.5f, 0.0f, 1.0f},
+        glm::vec4{-0.5f, -0.5f, 0.0f, 1.0f},
     };
 
-    double angle = M_PI / 2;
+    double angle = M_PI / 2.0;
 
-    glm::mat3x3 r = {
-        cos(angle), sin(angle), 0,   //
-        -sin(angle), -cos(angle), 0, //
-        0, 0, 0,                     //
-    };
+    glm::mat4 r = glm::rotate(glm::mat4(1.0f), (float)angle, glm::vec3(1.0f));
 
     std::array<unsigned int, 6>
         indices = {
@@ -70,12 +68,12 @@ protected:
         vbo = std::make_unique<Buffer>();
         vbo->target(Buffer::Target::Array)
             .usage(Buffer::Usage::DYNAMIC_DRAW)
-            .size(points.size() * sizeof(glm::vec3))
+            .size(points.size() * sizeof(glm::vec4))
             .data(points.data());
 
         // ibo = std::make_unique<Buffer>(indices.size() * sizeof(unsigned int), indices.data(), Buffer::Target::Index, Buffer::Usage::DYNAMIC_DRAW);
         layout = std::make_unique<VertexLayout>();
-        layout->attribute<float>(3, false);
+        layout->attribute<float>(4, false);
 
         vao = std::make_unique<VertexArray>();
         vao->buffer(*vbo, *layout);
@@ -90,23 +88,23 @@ protected:
         if (timer.delta() > 0.5)
         {
             timer.reset();
-            points[0] = points[0] * r;
-            points[1] = points[1] * r;
-            points[2] = points[2] * r;
+            points[0] = r * points[0];
+            points[1] = r * points[1];
+            points[2] = r * points[2];
         }
 
-        vbo->update(0, points.size() * sizeof(glm::vec3), points.data());
+        vbo->update(0, points.size() * sizeof(glm::vec4), points.data());
         Renderer::draw_arrays(*vao, 0, 3);
     }
 
 public:
-    Application() : ApplicationBase("Pong")
+    App() : Application("Pong")
     {
     }
 };
 
 int main(int argc, const char *argv[])
 {
-    Application app;
+    App app;
     app.start(argc, argv);
 }

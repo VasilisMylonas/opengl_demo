@@ -6,7 +6,7 @@
 #include <string>
 #include <string_view>
 
-class ApplicationBase
+class Application
 {
 private:
     std::string name_;
@@ -19,8 +19,8 @@ protected:
     virtual void render() = 0;
 
 public:
-    ApplicationBase(std::string_view name);
-    virtual ~ApplicationBase();
+    Application(std::string_view name);
+    virtual ~Application();
     void start(int argc, const char *argv[]);
     const std::string &name() const;
     const Logger &logger() const;

@@ -1,4 +1,4 @@
-#include "application_base.hpp"
+#include "application.hpp"
 
 #include "config.hpp"
 #include "window.hpp"
@@ -8,17 +8,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-const std::string &ApplicationBase::name() const
+const std::string &Application::name() const
 {
     return name_;
 }
 
-const Logger &ApplicationBase::logger() const
+const Logger &Application::logger() const
 {
     return logger_;
 }
 
-ApplicationBase::ApplicationBase(std::string_view name)
+Application::Application(std::string_view name)
     : name_{name}, logger_{std::clog, name}
 {
     if (!glfwInit())
@@ -29,12 +29,12 @@ ApplicationBase::ApplicationBase(std::string_view name)
     glfwSetErrorCallback(on_glfw_error);
 }
 
-ApplicationBase::~ApplicationBase()
+Application::~Application()
 {
     glfwTerminate();
 }
 
-void ApplicationBase::on_glfw_error(int error, const char *description)
+void Application::on_glfw_error(int error, const char *description)
 {
     (void)error;
     (void)description;
@@ -42,7 +42,7 @@ void ApplicationBase::on_glfw_error(int error, const char *description)
     // logger_.error(description);
 }
 
-void ApplicationBase::start(int argc, const char *argv[])
+void Application::start(int argc, const char *argv[])
 {
     (void)argc;
     (void)argv;
