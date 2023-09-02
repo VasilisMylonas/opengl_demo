@@ -13,11 +13,18 @@ public:
     bool should_close() const;
     bool current() const;
 
-    void resize(int width, int height);
-    void close();
-    void swap_buffers();
-    void make_current();
-    void swap_interval(int interval);
+    Window &resize(int width, int height);
+    Window &close();
+    Window &focus();
+    Window &maximize();
+    Window &minimize();
+    Window &restore();
+    Window &attention();
+    Window &show();
+    Window &hide();
+    Window &swap_buffers();
+    Window &make_current();
+    Window &swap_interval(int interval);
 
     Window(int width, int height, const char *title);
     Window(const Window &) = delete;

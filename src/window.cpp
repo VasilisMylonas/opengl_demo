@@ -67,9 +67,10 @@ std::pair<int, int> Window::size() const
     return {width, height};
 }
 
-void Window::resize(int width, int height)
+Window &Window::resize(int width, int height)
 {
     glfwSetWindowSize(handle_, width, height);
+    return *this;
 }
 
 bool Window::should_close() const
@@ -77,17 +78,61 @@ bool Window::should_close() const
     return glfwWindowShouldClose(handle_);
 }
 
-void Window::close()
+Window &Window::close()
 {
     glfwSetWindowShouldClose(handle_, GLFW_TRUE);
+    return *this;
 }
 
-void Window::swap_buffers()
+Window &Window::swap_buffers()
 {
     glfwSwapBuffers(handle_);
+    return *this;
 }
 
-void Window::make_current()
+Window &Window::show()
+{
+    glfwShowWindow(handle_);
+    return *this;
+}
+
+Window &Window::hide()
+{
+    glfwHideWindow(handle_);
+    return *this;
+}
+
+Window &Window::attention()
+{
+    glfwRequestWindowAttention(handle_);
+    return *this;
+}
+
+Window &Window::restore()
+{
+    glfwRestoreWindow(handle_);
+    return *this;
+}
+
+Window &Window::minimize()
+{
+    glfwIconifyWindow(handle_);
+    return *this;
+}
+
+Window &Window::maximize()
+{
+    glfwMaximizeWindow(handle_);
+    return *this;
+}
+
+Window &Window::focus()
+{
+    glfwFocusWindow(handle_);
+    return *this;
+}
+
+Window &Window::make_current()
 {
     glfwMakeContextCurrent(handle_);
 
@@ -98,6 +143,8 @@ void Window::make_current()
     {
         // TODO: throw
     }
+
+    return *this;
 }
 
 bool Window::current() const
@@ -105,10 +152,11 @@ bool Window::current() const
     return glfwGetCurrentContext() == handle_;
 }
 
-void Window::swap_interval(int interval)
+Window &Window::swap_interval(int interval)
 {
     auto previous = glfwGetCurrentContext();
     make_current();
     glfwSwapInterval(interval);
     glfwMakeContextCurrent(previous);
+    return *this;
 }
