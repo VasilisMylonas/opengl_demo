@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gl/buffer.hpp"
-#include "gl/vertex_layout.hpp"
+#include "gl/layout.hpp"
 
 namespace gl
 {
@@ -18,40 +18,57 @@ namespace gl
             GL_CALL(glDeleteVertexArrays(1, &handle_));
         }
 
-        VertexArray &buffer(const Buffer &vbo, const VertexLayout &layout, const Buffer &ibo)
-        {
-            bind();
-            ibo.bind();
-            buffer(vbo, layout);
-            unbind();
-            ibo.unbind();
-            return *this;
-        }
-
-        VertexArray &buffer(const Buffer &vbo, const VertexLayout &layout)
+        VertexArray &buffer(const Buffer &vbo, const Layout &layout)
         {
             bind();
             vbo.bind();
 
-            const auto &attr = layout.attributes();
             auto stride = static_cast<GLuint>(layout.stride());
             std::size_t offset = 0;
 
-            for (std::size_t i = 0; i < attr.size(); i++)
+            for (std::size_t i = 0; i < layout.count(); i++)
             {
                 auto index = static_cast<GLuint>(i);
                 GL_CALL(glEnableVertexArrayAttrib(handle_, index));
                 GL_CALL(glVertexAttribPointer(
                     index,
-                    attr[i].count,
-                    attr[i].type,
-                    attr[i].normalized,
+                    layout[i].count,
+                    layout[i].type,
+                    layout[i].normalized,
                     stride,
                     reinterpret_cast<void *>(offset)));
-                offset += attr[i].count * attr[i].size;
+                offset += layout[i].count * layout[i].size;
             }
 
             vbo.unbind();
+            unbind();
+            return *this;
+        }
+
+        VertexArray &draw(std::size_t count)
+        {
+            draw(0, count);
+            return *this;
+        }
+
+        VertexArray &draw(std::size_t first, std::size_t count)
+        {
+            bind();
+            GL_CALL(glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count)));
+            unbind();
+            return *this;
+        }
+
+        const VertexArray &draw(std::size_t count) const
+        {
+            draw(0, count);
+            return *this;
+        }
+
+        const VertexArray &draw(std::size_t first, std::size_t count) const
+        {
+            bind();
+            glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count));
             unbind();
             return *this;
         }
@@ -80,5 +97,4 @@ namespace gl
             return *this;
         }
     };
-
 } // namespace gl

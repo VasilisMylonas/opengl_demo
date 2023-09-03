@@ -1,9 +1,8 @@
 #include "application.hpp"
 
 #include "config.hpp"
-#include "window.hpp"
-#include "timer.hpp"
-#include "renderer.hpp"
+
+#include <iostream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

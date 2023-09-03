@@ -7,7 +7,7 @@ namespace gl
     class Buffer : public Object
     {
     public:
-        enum class Usage : GLenum
+        enum class Usage
         {
             STATIC_DRAW = GL_STATIC_DRAW,
             DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
@@ -20,11 +20,18 @@ namespace gl
             STREAM_COPY = GL_STREAM_COPY,
         };
 
-        enum class Target : GLenum
+        enum class Target
         {
-            Index = GL_ELEMENT_ARRAY_BUFFER,
-            Array = GL_ARRAY_BUFFER,
-            Texture = GL_TEXTURE_BUFFER,
+            INDEX = GL_ELEMENT_ARRAY_BUFFER,
+            ARRAY = GL_ARRAY_BUFFER,
+            TEXTURE = GL_TEXTURE_BUFFER,
+        };
+
+        enum class Access
+        {
+            READ_ONLY = GL_READ_ONLY,
+            WRITE_ONLY = GL_WRITE_ONLY,
+            READ_WRITE = GL_READ_WRITE,
         };
 
         Buffer()
@@ -35,6 +42,22 @@ namespace gl
         ~Buffer()
         {
             GL_CALL(glDeleteBuffers(1, &handle_));
+        }
+
+        void *map(Access access)
+        {
+            bind();
+            void *ret = glMapBuffer(static_cast<GLenum>(target_), static_cast<GLenum>(access));
+            unbind();
+            return ret;
+        }
+
+        bool unmap()
+        {
+            bind();
+            bool ret = glUnmapBuffer(static_cast<GLenum>(target_));
+            unbind();
+            return ret;
         }
 
         Buffer &size(std::size_t size)
@@ -123,6 +146,6 @@ namespace gl
     private:
         std::size_t size_{0};
         Usage usage_{Usage::STATIC_DRAW};
-        Target target_{Target::Array};
+        Target target_{Target::ARRAY};
     };
 } // namespace gl

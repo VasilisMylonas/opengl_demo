@@ -13,6 +13,7 @@
 #include "fps_counter.hpp"
 #include "renderer.hpp"
 
+#include "gl/layout.hpp"
 #include "gl/shader.hpp"
 #include "gl/program.hpp"
 #include "gl/buffer.hpp"
@@ -24,9 +25,8 @@ class App : public Application
 {
 private:
     std::unique_ptr<Buffer> vbo;
-    std::unique_ptr<Buffer> ibo;
     std::unique_ptr<VertexArray> vao;
-    std::unique_ptr<VertexLayout> layout;
+    std::unique_ptr<Layout> layout;
 
     FpsCounter counter{};
     Timer timer{};
@@ -36,20 +36,6 @@ private:
         glm::vec4{0.5f, -0.5f, 0.0f, 1.0f},
         glm::vec4{-0.5f, -0.5f, 0.0f, 1.0f},
     };
-
-    double angle = M_PI / 2.0;
-
-    glm::mat4 r = glm::rotate(glm::mat4(1.0f), (float)angle, glm::vec3(1.0f));
-
-    std::array<unsigned int, 6>
-        indices = {
-            0,
-            1,
-            1,
-            2,
-            2,
-            0,
-        };
 
 protected:
     virtual Window init() override
@@ -66,14 +52,13 @@ protected:
         program.attach(fs).attach(vs).link().use().detach(fs).detach(vs);
 
         vbo = std::make_unique<Buffer>();
-        vbo->target(Buffer::Target::Array)
+        vbo->target(Buffer::Target::ARRAY)
             .usage(Buffer::Usage::DYNAMIC_DRAW)
             .size(points.size() * sizeof(glm::vec4))
             .data(points.data());
 
-        // ibo = std::make_unique<Buffer>(indices.size() * sizeof(unsigned int), indices.data(), Buffer::Target::Index, Buffer::Usage::DYNAMIC_DRAW);
-        layout = std::make_unique<VertexLayout>();
-        layout->attribute<float>(4, false);
+        layout = std::make_unique<Layout>();
+        layout->push<4, float>();
 
         vao = std::make_unique<VertexArray>();
         vao->buffer(*vbo, *layout);
@@ -88,13 +73,10 @@ protected:
         if (timer.delta() > 0.5)
         {
             timer.reset();
-            points[0] = r * points[0];
-            points[1] = r * points[1];
-            points[2] = r * points[2];
         }
 
         vbo->update(0, points.size() * sizeof(glm::vec4), points.data());
-        Renderer::draw_arrays(*vao, 0, 3);
+        vao->draw(3);
     }
 
 public:
