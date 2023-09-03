@@ -2,6 +2,8 @@
 
 #include "gl/object.hpp"
 
+#include <array>
+
 namespace gl
 {
     class Buffer : public Object
@@ -37,6 +39,32 @@ namespace gl
         Buffer()
         {
             GL_CALL(glGenBuffers(1, &handle_));
+        }
+
+        Buffer(Buffer &&other)
+            : Object(std::move(other)), size_{other.size_}, usage_{other.usage_}, target_{other.target_}
+        {
+        }
+
+        Buffer &operator=(Buffer &&other)
+        {
+            size_ = other.size_;
+            usage_ = other.usage_;
+            target_ = other.target_;
+            Object::operator=(std::move(other));
+            return *this;
+        }
+
+        template <class T>
+        static Buffer from_array(const T &data, Target target, Usage usage)
+        {
+            Buffer buffer;
+            buffer.target(target)
+                .usage(usage)
+                .size(data.size() * sizeof(T))
+                .alloc()
+                .data(0, data.size() * sizeof(T), data.data());
+            return buffer;
         }
 
         ~Buffer()
@@ -117,13 +145,13 @@ namespace gl
             return *this;
         }
 
-        Buffer &data(const void *data)
+        Buffer &alloc()
         {
             bind();
             GL_CALL(glBufferData(
                 static_cast<GLenum>(target_),
                 static_cast<GLsizeiptr>(size_),
-                data,
+                nullptr,
                 static_cast<GLenum>(usage_)));
             unbind();
             return *this;
@@ -131,7 +159,7 @@ namespace gl
 
         // TODO: get buffer data?
 
-        Buffer &update(std::ptrdiff_t offset, std::size_t size, const void *data)
+        Buffer &data(std::ptrdiff_t offset, std::size_t size, const void *data)
         {
             bind();
             GL_CALL(glBufferSubData(

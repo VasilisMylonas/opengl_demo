@@ -25,6 +25,16 @@ namespace gl
             GL_CALL(glDeleteShader(handle_));
         }
 
+        Shader(Shader &&other) : Object(std::move(other))
+        {
+        }
+
+        Shader &operator=(Shader &&other)
+        {
+            Object::operator=(std::move(other));
+            return *this;
+        }
+
         std::string source() const
         {
             GLint param;

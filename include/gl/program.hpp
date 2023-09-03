@@ -17,6 +17,16 @@ namespace gl
             GL_CALL(glDeleteProgram(handle_));
         }
 
+        Program(Program &&other) : Object(std::move(other))
+        {
+        }
+
+        Program &operator=(Program &&other)
+        {
+            Object::operator=(std::move(other));
+            return *this;
+        }
+
         bool valid() const
         {
             glValidateProgram(handle_);

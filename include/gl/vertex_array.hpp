@@ -18,6 +18,16 @@ namespace gl
             GL_CALL(glDeleteVertexArrays(1, &handle_));
         }
 
+        VertexArray(VertexArray &&other) : Object(std::move(other))
+        {
+        }
+
+        VertexArray &operator=(VertexArray &&other)
+        {
+            Object::operator=(std::move(other));
+            return *this;
+        }
+
         VertexArray &buffer(const Buffer &vbo, const Layout &layout)
         {
             bind();
@@ -54,6 +64,7 @@ namespace gl
         VertexArray &draw(std::size_t first, std::size_t count)
         {
             bind();
+            // TODO: draw type
             GL_CALL(glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count)));
             unbind();
             return *this;
@@ -68,7 +79,7 @@ namespace gl
         const VertexArray &draw(std::size_t first, std::size_t count) const
         {
             bind();
-            glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count));
+            GL_CALL(glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count)));
             unbind();
             return *this;
         }

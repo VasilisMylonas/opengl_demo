@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <array>
+#include <optional>
 
 #include <glm/glm.hpp>
 #include <glm/matrix.hpp>
@@ -24,9 +25,9 @@ using namespace gl;
 class App : public Application
 {
 private:
-    std::unique_ptr<Buffer> vbo;
-    std::unique_ptr<VertexArray> vao;
-    std::unique_ptr<Layout> layout;
+    std::optional<Buffer> vbo;
+    std::optional<VertexArray> vao;
+    std::optional<Layout> layout;
 
     FpsCounter counter{};
     Timer timer{};
@@ -51,16 +52,12 @@ protected:
         Program program{};
         program.attach(fs).attach(vs).link().use().detach(fs).detach(vs);
 
-        vbo = std::make_unique<Buffer>();
-        vbo->target(Buffer::Target::ARRAY)
-            .usage(Buffer::Usage::DYNAMIC_DRAW)
-            .size(points.size() * sizeof(glm::vec4))
-            .data(points.data());
+        vbo = Buffer::from_array(points, Buffer::Target::ARRAY, Buffer::Usage::DYNAMIC_DRAW);
 
-        layout = std::make_unique<Layout>();
+        layout.emplace();
         layout->push<4, float>();
 
-        vao = std::make_unique<VertexArray>();
+        vao.emplace();
         vao->buffer(*vbo, *layout);
 
         return window;
@@ -75,8 +72,8 @@ protected:
             timer.reset();
         }
 
-        vbo->update(0, points.size() * sizeof(glm::vec4), points.data());
-        vao->draw(3);
+        vbo->data(0, points.size() * sizeof(glm::vec4), points.data());
+        vao->draw(10);
     }
 
 public:
