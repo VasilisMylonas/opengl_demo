@@ -22,7 +22,7 @@ namespace gl
 
         ~Shader()
         {
-            glDeleteShader(handle_);
+            GL_CALL(glDeleteShader(handle_));
         }
 
         std::string source() const
@@ -34,7 +34,7 @@ namespace gl
 
             std::string src{};
             src.resize(static_cast<std::size_t>(size + 1));
-            glGetShaderSource(handle_, size + 1, &size, src.data());
+            GL_CALL(glGetShaderSource(handle_, size + 1, &size, src.data()));
             src.resize(static_cast<std::size_t>(size));
             return src;
         }

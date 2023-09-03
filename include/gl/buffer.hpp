@@ -47,7 +47,7 @@ namespace gl
         void *map(Access access)
         {
             bind();
-            void *ret = glMapBuffer(static_cast<GLenum>(target_), static_cast<GLenum>(access));
+            GL_CALL(void *ret = glMapBuffer(static_cast<GLenum>(target_), static_cast<GLenum>(access)));
             unbind();
             return ret;
         }
@@ -55,7 +55,7 @@ namespace gl
         bool unmap()
         {
             bind();
-            bool ret = glUnmapBuffer(static_cast<GLenum>(target_));
+            GL_CALL(bool ret = glUnmapBuffer(static_cast<GLenum>(target_)));
             unbind();
             return ret;
         }
@@ -134,11 +134,11 @@ namespace gl
         Buffer &update(std::ptrdiff_t offset, std::size_t size, const void *data)
         {
             bind();
-            glBufferSubData(
+            GL_CALL(glBufferSubData(
                 static_cast<GLenum>(target_),
                 static_cast<GLintptr>(offset),
                 static_cast<GLsizeiptr>(size),
-                data);
+                data));
             unbind();
             return *this;
         }

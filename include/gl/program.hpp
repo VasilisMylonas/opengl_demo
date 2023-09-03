@@ -22,7 +22,7 @@ namespace gl
             glValidateProgram(handle_);
 
             int status;
-            glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status);
+            GL_CALL(glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status));
             return static_cast<bool>(status);
         }
 
