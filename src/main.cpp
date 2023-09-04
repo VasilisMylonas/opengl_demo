@@ -28,7 +28,7 @@ private:
     std::optional<Buffer> vbo;
     std::optional<VertexArray> vao;
     Layout layout = {
-        {0, vec4<float>()},
+        {0, Attribute::vec4<float>},
     };
 
     FpsCounter counter{};

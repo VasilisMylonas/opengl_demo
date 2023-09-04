@@ -46,7 +46,6 @@ void Application::start(int argc, const char *argv[])
     (void)argc;
     (void)argv;
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
     Window window = init();
     window.make_current();
 
