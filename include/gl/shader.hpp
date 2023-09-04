@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <sys/stat.h>
 
 #include "gl/object.hpp"
 
@@ -49,6 +50,11 @@ namespace gl
             return src;
         }
 
+        Shader &source_path(const char *path)
+        {
+            return source(load_file(path));
+        }
+
         Shader &source(std::string_view source)
         {
             const char *source_array[1] = {source.data()};
@@ -61,6 +67,24 @@ namespace gl
         {
             GL_CALL(glCompileShader(handle_));
             return *this;
+        }
+
+    private:
+        // TODO
+        static std::string load_file(const char *path)
+        {
+            FILE *f = fopen(path, "rb");
+
+            struct stat st;
+            fstat(fileno(f), &st);
+
+            std::string contents;
+            contents.resize(st.st_size);
+
+            fread(contents.data(), sizeof(char), st.st_size, f);
+            fclose(f);
+
+            return contents;
         }
     };
 } // namespace gl

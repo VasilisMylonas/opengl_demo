@@ -19,7 +19,7 @@ namespace gl
     class Object
     {
     protected:
-        GLuint handle_;
+        unsigned int handle_;
         Object() = default;
         Object(const Object &) = delete;
         Object &operator=(const Object &) = delete;
@@ -38,7 +38,7 @@ namespace gl
             return *this;
         }
 
-        GLuint handle() const
+        unsigned int handle() const
         {
             return handle_;
         }

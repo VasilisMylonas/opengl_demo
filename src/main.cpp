@@ -13,41 +13,50 @@
 #include "application.hpp"
 #include "fps_counter.hpp"
 
-#include "gl/layout.hpp"
+// #include "gl/layout.hpp"
 #include "gl/shader.hpp"
 #include "gl/program.hpp"
 #include "gl/buffer.hpp"
-#include "gl/vertex_array.hpp"
+// #include "gl/vertex_array.hpp"
+
+#include "vertex.hpp"
+#include "renderer.hpp"
 
 using namespace gl;
 
 class App : public Application
 {
 private:
-    std::optional<Buffer> vbo;
-    std::optional<Buffer> ibo;
+    std::optional<VertexBuffer> vbo;
+    std::optional<IndexBuffer> ibo;
     std::optional<VertexArray> vao;
-    Layout layout = {
-        {0, Attribute::vec4<float>},
-    };
 
     FpsCounter counter{};
     Timer timer{};
 
-    std::array<glm::vec4, 6> points = {
-        glm::vec4{0.5, 0.5, 0, 1},
-        glm::vec4{0.5, -0.5, 0, 1},
-        glm::vec4{-0.5, -0.5, 0, 1},
-        glm::vec4{-0.5, 0.5, 0, 1},
+    std::array<Vertex, 4> vertices = {
+        Vertex{
+            .position = {0, 1, 0},
+            .color = {1, 0, 0, 0},
+        },
+        Vertex{
+            .position = {1, -1, 0},
+            .color = {0, 1, 0, 0},
+        },
+        Vertex{
+            .position = {-1, -1, 0},
+            .color = {0, 0, 1, 0},
+        },
+        Vertex{
+            .position = {-1, -1, 0},
+            .color = {1, 0, 1, 0},
+        },
     };
 
-    std::array<unsigned int, 6> indices = {
+    std::array<unsigned int, 3> indices = {
         0,
         1,
         2,
-        2,
-        3,
-        0,
     };
 
 protected:
@@ -56,35 +65,44 @@ protected:
         Window window{1000, 400, "Pong"};
         window.make_current();
 
-        Shader fs{Shader::Type::FRAGMENT};
-        Shader vs{Shader::Type::VERTEX};
-        fs.source(fragment_shader).compile();
-        vs.source(vertex_shader).compile();
+        reload_shaders();
 
-        Program program{};
-        program.attach(fs).attach(vs).link().use().detach(fs).detach(vs);
-
-        vbo = Buffer::from_array(points, Buffer::Target::ARRAY, Buffer::Usage::DYNAMIC_DRAW);
-
+        vbo.emplace(4, BufferUsage::DYNAMIC_DRAW);
+        ibo.emplace(6, BufferUsage::DYNAMIC_DRAW);
         vao.emplace();
-        vao->buffer(*vbo, layout);
 
-        ibo = Buffer::from_array(indices, Buffer::Target::INDEX, Buffer::Usage::STATIC_DRAW);
+        vao->buffers(*vbo, *ibo);
+        vbo->data(4, vertices.data());
+        ibo->data(3, indices.data());
 
         return window;
     }
 
+    void reload_shaders()
+    {
+        Shader fs{Shader::Type::FRAGMENT};
+        Shader vs{Shader::Type::VERTEX};
+        fs.source_path("../shaders/shader.fs").compile();
+        vs.source_path("../shaders/shader.vs").compile();
+
+        Program program{};
+        program.attach(vs).attach(fs).link().use();
+        // .detach(fs).detach(vs);
+    }
+
     virtual void render() override
     {
+        glClear(GL_COLOR_BUFFER_BIT);
+
         logger().info("%.2lffps", counter.fps());
 
-        if (timer.delta() > 0.5)
+        if (timer.delta() > 1)
         {
+            reload_shaders();
             timer.reset();
         }
 
-        // vbo->data(0, points.size() * sizeof(glm::vec4), points.data());
-        vao->draw_elements(DrawMode::TRIANGLES, 6, *ibo);
+        vao->draw(3);
     }
 
 public:

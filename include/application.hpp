@@ -16,7 +16,9 @@ private:
 
 protected:
     virtual Window init() = 0;
-    virtual void render() = 0;
+    virtual void render();
+    virtual void logic();
+    virtual void input();
 
 public:
     Application(int argc, const char *argv[]);

@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(notagame CXX)
 
-file(READ shaders/shader.fs FS)
-file(READ shaders/shader.vs VS)
-
 file(GLOB SRC src/*.cpp )
 
 add_executable(notagame ${SRC})
