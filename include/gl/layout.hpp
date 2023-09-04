@@ -12,7 +12,6 @@ namespace gl
     {
     private:
         std::unordered_map<std::size_t, Attribute> attributes_{};
-        std::size_t stride_{0};
 
     public:
         Layout() = default;
@@ -20,6 +19,18 @@ namespace gl
         Layout(std::initializer_list<std::pair<const std::size_t, Attribute>> list)
             : attributes_{list}
         {
+        }
+
+        std::size_t stride() const
+        {
+            std::size_t value = 0;
+
+            for (auto &&attribute : attributes_)
+            {
+                value += attribute.second.stride;
+            }
+
+            return value;
         }
 
         std::size_t count() const

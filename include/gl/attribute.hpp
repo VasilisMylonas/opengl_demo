@@ -13,6 +13,7 @@ namespace gl
         Attribute() = default;
 
         friend class VertexArray;
+        friend class Layout;
 
         template <std::size_t Count, class T>
         static Attribute make(bool normalized = false)

@@ -12,7 +12,6 @@
 
 #include "application.hpp"
 #include "fps_counter.hpp"
-#include "renderer.hpp"
 
 #include "gl/layout.hpp"
 #include "gl/shader.hpp"
@@ -26,6 +25,7 @@ class App : public Application
 {
 private:
     std::optional<Buffer> vbo;
+    std::optional<Buffer> ibo;
     std::optional<VertexArray> vao;
     Layout layout = {
         {0, Attribute::vec4<float>},
@@ -34,10 +34,20 @@ private:
     FpsCounter counter{};
     Timer timer{};
 
-    std::array<glm::vec4, 3> points = {
-        glm::vec4{0.0f, 0.5f, 0.0f, 1.0f},
-        glm::vec4{0.5f, -0.5f, 0.0f, 1.0f},
-        glm::vec4{-0.5f, -0.5f, 0.0f, 1.0f},
+    std::array<glm::vec4, 6> points = {
+        glm::vec4{0.5, 0.5, 0, 1},
+        glm::vec4{0.5, -0.5, 0, 1},
+        glm::vec4{-0.5, -0.5, 0, 1},
+        glm::vec4{-0.5, 0.5, 0, 1},
+    };
+
+    std::array<unsigned int, 6> indices = {
+        0,
+        1,
+        2,
+        2,
+        3,
+        0,
     };
 
 protected:
@@ -59,6 +69,8 @@ protected:
         vao.emplace();
         vao->buffer(*vbo, layout);
 
+        ibo = Buffer::from_array(indices, Buffer::Target::INDEX, Buffer::Usage::STATIC_DRAW);
+
         return window;
     }
 
@@ -71,8 +83,8 @@ protected:
             timer.reset();
         }
 
-        vbo->data(0, points.size() * sizeof(glm::vec4), points.data());
-        vao->draw(3);
+        // vbo->data(0, points.size() * sizeof(glm::vec4), points.data());
+        vao->draw_elements(DrawMode::TRIANGLES, 6, *ibo);
     }
 
 public:

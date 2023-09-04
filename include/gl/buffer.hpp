@@ -9,6 +9,8 @@ namespace gl
     class Buffer : public Object
     {
     public:
+        friend class VertexArray;
+
         enum class Usage
         {
             STATIC_DRAW = GL_STATIC_DRAW,
@@ -105,6 +107,7 @@ namespace gl
             return *this;
         }
 
+    protected:
         void bind() const
         {
             GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));

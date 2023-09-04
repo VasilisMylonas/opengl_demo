@@ -5,6 +5,17 @@
 
 namespace gl
 {
+    enum class DrawMode
+    {
+        POINTS = GL_POINTS,
+        LINES = GL_LINES,
+        LINE_STRIP = GL_LINE_STRIP,
+        LINE_LOOP = GL_LINE_LOOP,
+        TRIANGLES = GL_TRIANGLES,
+        TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+        TRIANGLE_FAN = GL_TRIANGLE_FAN,
+    };
+
     class VertexArray : public Object
     {
     public:
@@ -34,6 +45,7 @@ namespace gl
             vbo.bind();
 
             std::size_t offset = 0;
+            std::size_t stride = layout.stride();
 
             for (std::size_t i = 0; i < layout.count(); i++)
             {
@@ -44,7 +56,7 @@ namespace gl
                     layout[i].count,
                     layout[i].type,
                     layout[i].normalized,
-                    layout[i].stride,
+                    static_cast<GLsizei>(stride),
                     reinterpret_cast<void *>(offset)));
                 offset += layout[i].stride;
             }
@@ -54,57 +66,64 @@ namespace gl
             return *this;
         }
 
-        VertexArray &draw(std::size_t count)
-        {
-            draw(0, count);
-            return *this;
-        }
-
-        VertexArray &draw(std::size_t first, std::size_t count)
+        VertexArray &draw_elements(DrawMode mode, std::size_t count, const Buffer &ibo)
         {
             bind();
-            // TODO: draw type
-            GL_CALL(glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count)));
+            ibo.bind();
+            GL_CALL(glDrawElements(static_cast<GLenum>(mode), static_cast<GLsizei>(count), GL_UNSIGNED_INT, nullptr));
+            ibo.unbind();
             unbind();
             return *this;
         }
 
-        const VertexArray &draw(std::size_t count) const
-        {
-            draw(0, count);
-            return *this;
-        }
-
-        const VertexArray &draw(std::size_t first, std::size_t count) const
+        const VertexArray &draw_elements(DrawMode mode, std::size_t count, const Buffer &ibo) const
         {
             bind();
-            GL_CALL(glDrawArrays(GL_TRIANGLES, static_cast<GLint>(first), static_cast<GLsizei>(count)));
+            ibo.bind();
+            GL_CALL(glDrawElements(static_cast<GLenum>(mode), static_cast<GLsizei>(count), GL_UNSIGNED_INT, nullptr));
+            ibo.unbind();
             unbind();
             return *this;
         }
 
-        VertexArray &bind()
+        VertexArray &draw(DrawMode mode, std::size_t count)
+        {
+            draw(mode, 0, count);
+            return *this;
+        }
+
+        const VertexArray &draw(DrawMode mode, std::size_t count) const
+        {
+            draw(mode, 0, count);
+            return *this;
+        }
+
+        VertexArray &draw(DrawMode mode, std::size_t first, std::size_t count)
+        {
+            bind();
+            GL_CALL(glDrawArrays(static_cast<GLenum>(mode), static_cast<GLint>(first), static_cast<GLsizei>(count)));
+            unbind();
+            return *this;
+        }
+
+        const VertexArray &draw(DrawMode mode, std::size_t first, std::size_t count) const
+        {
+            bind();
+            GL_CALL(glDrawArrays(static_cast<GLenum>(mode), static_cast<GLint>(first), static_cast<GLsizei>(count)));
+            unbind();
+            return *this;
+        }
+
+    protected:
+        void
+        bind() const
         {
             GL_CALL(glBindVertexArray(handle_));
-            return *this;
         }
 
-        VertexArray &unbind()
+        void unbind() const
         {
             GL_CALL(glBindVertexArray(0));
-            return *this;
-        }
-
-        const VertexArray &bind() const
-        {
-            GL_CALL(glBindVertexArray(handle_));
-            return *this;
-        }
-
-        const VertexArray &unbind() const
-        {
-            GL_CALL(glBindVertexArray(0));
-            return *this;
         }
     };
 } // namespace gl
