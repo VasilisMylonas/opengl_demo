@@ -36,34 +36,37 @@ namespace gl
             READ_WRITE = GL_READ_WRITE,
         };
 
-        Buffer()
+        Buffer(std::size_t size, Target target, Usage usage)
+            : target_{target}
         {
             GL_CALL(glGenBuffers(1, &handle_));
+
+            bind();
+            GL_CALL(glBufferData(
+                static_cast<GLenum>(target),
+                static_cast<GLsizeiptr>(size),
+                nullptr,
+                static_cast<GLenum>(usage)));
+            unbind();
         }
 
         Buffer(Buffer &&other)
-            : Object(std::move(other)), size_{other.size_}, usage_{other.usage_}, target_{other.target_}
+            : Object(std::move(other)), target_{other.target_}
         {
         }
 
         Buffer &operator=(Buffer &&other)
         {
-            size_ = other.size_;
-            usage_ = other.usage_;
             target_ = other.target_;
             Object::operator=(std::move(other));
             return *this;
         }
 
-        template <class T>
-        static Buffer from_array(const T &data, Target target, Usage usage)
+        template <class T, std::size_t N>
+        static Buffer from_array(const std::array<T, N> &data, Target target, Usage usage)
         {
-            Buffer buffer;
-            buffer.target(target)
-                .usage(usage)
-                .size(data.size() * sizeof(T))
-                .alloc()
-                .data(0, data.size() * sizeof(T), data.data());
+            Buffer buffer{data.size() * sizeof(T), target, usage};
+            buffer.data(0, data.size() * sizeof(T), data.data());
             return buffer;
         }
 
@@ -88,75 +91,6 @@ namespace gl
             return ret;
         }
 
-        Buffer &size(std::size_t size)
-        {
-            size_ = size;
-            return *this;
-        }
-
-        std::size_t size() const
-        {
-            return size_;
-        }
-
-        Buffer &usage(Usage usage)
-        {
-            usage_ = usage;
-            return *this;
-        }
-
-        Usage usage() const
-        {
-            return usage_;
-        }
-
-        Buffer &target(Target target)
-        {
-            target_ = target;
-            return *this;
-        }
-
-        Target target() const
-        {
-            return target_;
-        }
-
-        Buffer &bind()
-        {
-            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));
-            return *this;
-        }
-
-        Buffer &unbind()
-        {
-            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), 0));
-            return *this;
-        }
-
-        const Buffer &bind() const
-        {
-            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));
-            return *this;
-        }
-
-        const Buffer &unbind() const
-        {
-            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), 0));
-            return *this;
-        }
-
-        Buffer &alloc()
-        {
-            bind();
-            GL_CALL(glBufferData(
-                static_cast<GLenum>(target_),
-                static_cast<GLsizeiptr>(size_),
-                nullptr,
-                static_cast<GLenum>(usage_)));
-            unbind();
-            return *this;
-        }
-
         // TODO: get buffer data?
 
         Buffer &data(std::ptrdiff_t offset, std::size_t size, const void *data)
@@ -171,9 +105,17 @@ namespace gl
             return *this;
         }
 
+        void bind() const
+        {
+            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), handle_));
+        }
+
+        void unbind() const
+        {
+            GL_CALL(glBindBuffer(static_cast<GLenum>(target_), 0));
+        }
+
     private:
-        std::size_t size_{0};
-        Usage usage_{Usage::STATIC_DRAW};
-        Target target_{Target::ARRAY};
+        Target target_;
     };
 } // namespace gl

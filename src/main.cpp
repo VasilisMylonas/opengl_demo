@@ -27,7 +27,9 @@ class App : public Application
 private:
     std::optional<Buffer> vbo;
     std::optional<VertexArray> vao;
-    std::optional<Layout> layout;
+    Layout layout = {
+        {0, vec4<float>()},
+    };
 
     FpsCounter counter{};
     Timer timer{};
@@ -54,11 +56,8 @@ protected:
 
         vbo = Buffer::from_array(points, Buffer::Target::ARRAY, Buffer::Usage::DYNAMIC_DRAW);
 
-        layout.emplace();
-        layout->push<4, float>();
-
         vao.emplace();
-        vao->buffer(*vbo, *layout);
+        vao->buffer(*vbo, layout);
 
         return window;
     }
@@ -73,7 +72,7 @@ protected:
         }
 
         vbo->data(0, points.size() * sizeof(glm::vec4), points.data());
-        vao->draw(10);
+        vao->draw(3);
     }
 
 public:

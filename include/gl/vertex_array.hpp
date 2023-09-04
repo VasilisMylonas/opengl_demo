@@ -33,7 +33,6 @@ namespace gl
             bind();
             vbo.bind();
 
-            auto stride = static_cast<GLuint>(layout.stride());
             std::size_t offset = 0;
 
             for (std::size_t i = 0; i < layout.count(); i++)
@@ -45,9 +44,9 @@ namespace gl
                     layout[i].count,
                     layout[i].type,
                     layout[i].normalized,
-                    stride,
+                    layout[i].stride,
                     reinterpret_cast<void *>(offset)));
-                offset += layout[i].count * layout[i].size;
+                offset += layout[i].stride;
             }
 
             vbo.unbind();
