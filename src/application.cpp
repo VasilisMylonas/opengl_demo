@@ -7,18 +7,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-const std::string &Application::name() const
-{
-    return name_;
-}
-
 const Logger &Application::logger() const
 {
     return logger_;
 }
 
-Application::Application(std::string_view name)
-    : name_{name}, logger_{std::clog, name}
+Application::Application(int argc, const char *argv[])
+    : logger_{std::clog, "Application"}, argc_{argc}, argv_{argv}
 {
     if (!glfwInit())
     {
@@ -41,11 +36,8 @@ void Application::on_glfw_error(int error, const char *description)
     // logger_.error(description);
 }
 
-void Application::start(int argc, const char *argv[])
+void Application::start()
 {
-    (void)argc;
-    (void)argv;
-
     Window window = init();
     window.make_current();
 

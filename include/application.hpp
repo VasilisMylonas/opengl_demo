@@ -9,9 +9,9 @@
 class Application
 {
 private:
-    std::string name_;
     Logger logger_;
-
+    int argc_;
+    const char **argv_;
     static void on_glfw_error(int error, const char *description);
 
 protected:
@@ -19,9 +19,8 @@ protected:
     virtual void render() = 0;
 
 public:
-    Application(std::string_view name);
+    Application(int argc, const char *argv[]);
     virtual ~Application();
-    void start(int argc, const char *argv[]);
-    const std::string &name() const;
+    void start();
     const Logger &logger() const;
 };

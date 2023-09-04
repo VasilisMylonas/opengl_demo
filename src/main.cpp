@@ -43,7 +43,7 @@ private:
 protected:
     virtual Window init() override
     {
-        Window window{1000, 400, name().c_str()};
+        Window window{1000, 400, "Pong"};
         window.make_current();
 
         Shader fs{Shader::Type::FRAGMENT};
@@ -76,13 +76,13 @@ protected:
     }
 
 public:
-    App() : Application("Pong")
+    App(int argc, const char *argv[]) : Application(argc, argv)
     {
     }
 };
 
 int main(int argc, const char *argv[])
 {
-    App app;
-    app.start(argc, argv);
+    App app{argc, argv};
+    app.start();
 }
