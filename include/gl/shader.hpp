@@ -26,7 +26,7 @@ namespace gl
             GL_CALL(glDeleteShader(handle_));
         }
 
-        Shader(Shader &&other) : Object(std::move(other))
+        Shader(Shader &&other) : Object{std::move(other)}
         {
         }
 

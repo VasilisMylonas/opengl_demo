@@ -38,8 +38,18 @@ namespace gl
         friend class VertexArray;
 
         template <class TOther, BufferTarget UOther>
-        explicit Buffer(Buffer<TOther, UOther> &&other) : Object(std::move(other))
+        explicit Buffer(Buffer<TOther, UOther> &&other) : Object{std::move(other)}
         {
+        }
+
+        Buffer(Buffer &&other) : Object{std::move(other)}
+        {
+        }
+
+        Buffer &operator=(Buffer &&other)
+        {
+            Object::operator=(std::move(other));
+            return *this;
         }
 
         Buffer(std::size_t count, BufferUsage usage)

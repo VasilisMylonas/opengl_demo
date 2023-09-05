@@ -17,7 +17,7 @@ namespace gl
             GL_CALL(glDeleteProgram(handle_));
         }
 
-        Program(Program &&other) : Object(std::move(other))
+        Program(Program &&other) : Object{std::move(other)}
         {
         }
 

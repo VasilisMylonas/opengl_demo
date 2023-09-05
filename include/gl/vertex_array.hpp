@@ -18,6 +18,16 @@ namespace gl
             GL_CALL(glGenVertexArrays(1, &handle_));
         }
 
+        VertexArray(VertexArray &&other) : Object{std::move(other)}
+        {
+        }
+
+        VertexArray &operator=(VertexArray &&other)
+        {
+            Object::operator=(std::move(other));
+            return *this;
+        }
+
         void buffers(const VertexBuffer &vbo, const IndexBuffer &ibo)
         {
             bind();
