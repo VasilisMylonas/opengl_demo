@@ -30,6 +30,12 @@ Application::Application(int argc, const char* argv[])
     current_ = this;
 }
 
+Application::Application(Application&& other)
+    : logger_{std::move(other.logger_)}, argc_{other.argc_}, argv_{other.argv_}
+{
+    current_ = this;
+}
+
 Application::~Application()
 {
     glfwTerminate();
@@ -57,6 +63,19 @@ Application& Application::current()
     }
 
     return *current_;
+}
+
+void Application::main_loop(Window& window)
+{
+    logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
+    logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+
+    while (!window.should_close())
+    {
+        poll_events();
+        window.render();
+        window.swap_buffers();
+    }
 }
 
 Application* Application::current_;

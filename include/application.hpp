@@ -15,32 +15,25 @@ private:
     static Application* current_;
     static void on_glfw_error(int error, const char* description);
 
+protected:
+    virtual void main_loop(Window& window);
+
 public:
     template <typename T, typename = std::enable_if_t<std::is_base_of_v<Window, T>>>
     void start()
     {
         std::unique_ptr<Window> window = std::make_unique<T>();
         window->make_current();
-
-        // TODO
-        // logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
-        // logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
-
-        while (!window->should_close())
-        {
-            poll_events();
-            window->render();
-            window->swap_buffers();
-        }
+        main_loop(*window);
     }
 
     static Application& current();
     void poll_events() const;
     Application(int argc, const char* argv[]);
     Application(const Application& other) = delete;
-    Application(Application&& other) = delete; // TODO: move is valid
+    Application(Application&& other);
     Application& operator=(const Application& other) = delete;
-    Application& operator=(Application&& other) = delete; // TODO: move is valid
+    Application& operator=(Application&& other) = delete; // TODO: move assignment
     virtual ~Application();
     const Logger& logger() const;
 };
