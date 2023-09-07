@@ -29,7 +29,7 @@ bool Program::valid() const
 
     int status;
     GL_CALL(glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status));
-    return static_cast<bool>(status);
+    return status;
 }
 
 Program& Program::attach(const Shader& shader)

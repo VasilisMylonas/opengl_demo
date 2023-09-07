@@ -1,26 +1,23 @@
+#include <array>
 #include <iostream>
 #include <memory>
-#include <array>
 #include <optional>
 
 #include <glm/glm.hpp>
-#include <glm/matrix.hpp>
-#include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/matrix.hpp>
 
 #include "config.hpp"
 
 #include "application.hpp"
+#include "cmdline.hpp"
 #include "fps_counter.hpp"
 
-// #include "gl/layout.hpp"
-#include "gl/shader.hpp"
-#include "gl/program.hpp"
 #include "gl/buffer.hpp"
-// #include "gl/vertex_array.hpp"
-
-#include "vertex.hpp"
-#include "renderer.hpp"
+#include "gl/program.hpp"
+#include "gl/shader.hpp"
+#include "gl/vertex_array.hpp"
 
 using namespace gl;
 
@@ -37,19 +34,19 @@ private:
     std::array<Vertex, 4> vertices = {
         Vertex{
             .position = {0, 1, 0},
-            .color = {1, 0, 0, 0},
+            .color = {1, 0, 0, 1},
         },
         Vertex{
             .position = {1, -1, 0},
-            .color = {0, 1, 0, 0},
+            .color = {0, 1, 0, 1},
         },
         Vertex{
             .position = {-1, -1, 0},
-            .color = {0, 0, 1, 0},
+            .color = {0, 0, 1, 1},
         },
         Vertex{
             .position = {-1, -1, 0},
-            .color = {1, 0, 1, 0},
+            .color = {1, 0, 1, 1},
         },
     };
 
@@ -64,6 +61,9 @@ protected:
     {
         Window window{1000, 400, "Pong"};
         window.make_current();
+
+        // glEnable(GL_BLEND);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         reload_shaders();
 
@@ -106,13 +106,31 @@ protected:
     }
 
 public:
-    App(int argc, const char *argv[]) : Application(argc, argv)
+    App(int argc, const char* argv[]) : Application(argc, argv)
     {
     }
 };
 
-int main(int argc, const char *argv[])
+std::array<Option, 2> x = {
+    Option{"show-fps", "Show FPS overlay"},
+    Option{'V', "version", "Print program version"},
+};
+
+int main(int argc, const char* argv[])
 {
-    App app{argc, argv};
-    app.start();
+    assert(x[0].required());
+    assert(!x[0].found());
+
+    CmdLine cmdline{argc, argv};
+    cmdline.getopt(x);
+    cmdline.usage(x, "Program Description");
+
+    assert(x[0].required());
+    assert(x[0].found());
+
+    std::cout << std::boolalpha << (bool)x[0] << std::endl;
+    // const auto &options = cmdline.options();
+
+    // App app{argc, argv};
+    // app.start();
 }

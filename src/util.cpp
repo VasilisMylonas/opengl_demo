@@ -1,0 +1,43 @@
+#include "util.hpp"
+
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <sys/stat.h>
+
+std::string Convert::to_lower(std::string_view value)
+{
+    std::string result{value};
+
+    std::transform(result.begin(),
+                   result.end(),
+                   result.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    return result;
+}
+
+bool Convert::to_bool(std::string_view value)
+{
+    std::string s = to_lower(value);
+    return s == "true" || s == "yes" || s == "on" || s == "1" || s == "y";
+}
+
+// TODO
+std::string read_file(std::string_view path)
+{
+    std::string path_str{path};
+
+    FILE* f = fopen(path_str.c_str(), "rb");
+
+    struct stat st;
+    fstat(fileno(f), &st);
+
+    std::string contents;
+    contents.resize(st.st_size);
+
+    fread(contents.data(), sizeof(char), st.st_size, f);
+    fclose(f);
+
+    return contents;
+}
