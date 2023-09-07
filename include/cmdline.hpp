@@ -22,6 +22,8 @@ public:
     const std::vector<std::string_view>& values() const;
     const std::unordered_map<std::string_view, std::string_view>& options() const;
 
+    bool getopt(Option& option) const;
+
     template <std::size_t N>
     void usage(const std::array<Option, N>& options, std::string_view program_description) const
     {
@@ -30,30 +32,14 @@ public:
 
         for (const Option& option : options)
         {
-            std::string short_option = option.make_short_option();
-            std::string long_option = option.make_long_option(32);
-            std::string description = option.make_description(64);
+            std::string short_option = option.make_short_string();
+            std::string long_option = option.make_long_string(32);
+            std::string description = option.make_description_string(64);
 
             std::cout << short_option << ' ' << long_option << ' ' << description << '\n';
         }
 
         std::cout << std::endl;
-    }
-
-    template <std::size_t N>
-    void getopt(std::array<Option, N>& options) const
-    {
-        for (Option& option : options)
-        {
-            set_if_key_exists(option, option.long_key());
-
-            auto short_key = option.short_key();
-            if (short_key)
-            {
-                char temp = short_key.value();
-                set_if_key_exists(option, {&temp, 1});
-            }
-        }
     }
 
 private:
@@ -72,12 +58,12 @@ private:
         VALUE,       // any other
     };
 
+    bool set_if_key_exists(Option& option, std::string_view key) const;
+
     void parse(int argc, const char** argv);
     void handle_long_assign(std::string_view arg);
     void handle_value(std::string_view arg);
     void handle_short_multi(std::string_view arg);
-
-    void set_if_key_exists(Option& option, std::string_view key) const;
 
     static bool is_empty(std::string_view arg);
     static bool is_long(std::string_view arg);

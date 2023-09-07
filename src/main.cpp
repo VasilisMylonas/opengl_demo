@@ -111,26 +111,26 @@ public:
     }
 };
 
-std::array<Option, 2> x = {
-    Option{"show-fps", "Show FPS overlay"},
-    Option{'V', "version", "Print program version"},
+std::array<Option, 3> options = {
+    Option{"show-fps", "Show FPS overlay", false},
+    Option{"lock-fps", "Set maximum FPS (default is unlimited)", true},
+    Option{'V', "version", "Print program version", false},
 };
 
 int main(int argc, const char* argv[])
 {
-    assert(x[0].required());
-    assert(!x[0].found());
-
     CmdLine cmdline{argc, argv};
-    cmdline.getopt(x);
-    cmdline.usage(x, "Program Description");
 
-    assert(x[0].required());
-    assert(x[0].found());
+    for (Option& option : options)
+    {
+        if (cmdline.getopt(option))
+        {
+            // TODO
+        }
+    }
 
-    std::cout << std::boolalpha << (bool)x[0] << std::endl;
-    // const auto &options = cmdline.options();
+    cmdline.usage(options, "Program Description");
 
-    // App app{argc, argv};
-    // app.start();
+    App app{argc, argv};
+    app.start();
 }

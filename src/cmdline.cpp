@@ -118,10 +118,33 @@ CmdLine::CmdLine(int argc, const char** argv) : program_name_{argv[0]}
     parse(argc, argv);
 }
 
-void CmdLine::set_if_key_exists(Option& option, std::string_view key) const
+bool CmdLine::set_if_key_exists(Option& option, std::string_view key) const
 {
-    if (options_.find(key) != options_.end())
+    if (options_.find(key) == options_.end())
     {
-        option.set_value(options_.at(key));
+        return false;
     }
+
+    option.set_value(options_.at(key));
+    return true;
+}
+
+bool CmdLine::getopt(Option& option) const
+{
+    if (set_if_key_exists(option, option.long_key()))
+    {
+        return true;
+    }
+
+    auto short_key = option.short_key();
+    if (short_key)
+    {
+        char temp = short_key.value();
+        if (set_if_key_exists(option, {&temp, 1}))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
