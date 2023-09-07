@@ -45,9 +45,7 @@ Application::~Application()
 void Application::on_glfw_error(int error, const char* description)
 {
     (void)error;
-    (void)description;
-    // TODO
-    // logger_.error(description);
+    current().logger().error(description);
 }
 
 void Application::poll_events() const
