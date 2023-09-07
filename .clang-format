@@ -1,0 +1,18 @@
+﻿---
+BasedOnStyle: LLVM
+AccessModifierOffset: "-4"
+AlwaysBreakTemplateDeclarations: "Yes"
+AllowShortBlocksOnASingleLine: "false"
+AllowShortFunctionsOnASingleLine: "None"
+BinPackArguments: "false"
+BinPackParameters: "false"
+BreakBeforeBraces: Allman
+ColumnLimit: "100"
+ConstructorInitializerAllOnOneLineOrOnePerLine: "true"
+DerivePointerAlignment: "false"
+FixNamespaceComments: "true"
+IndentCaseLabels: "false"
+IndentWidth: "4"
+PointerAlignment: Left
+SortIncludes: "true"
+SortUsingDeclarations: "true"

@@ -1,90 +1,35 @@
 #pragma once
 
-#include <string_view>
-#include <sys/stat.h>
-
 #include "gl/object.hpp"
+
+#include <string>
+#include <string_view>
 
 namespace gl
 {
-    class Shader : public Object
+
+class Shader : public Object
+{
+public:
+    enum class Type
     {
-    public:
-        enum class Type
-        {
-            FRAGMENT = GL_FRAGMENT_SHADER,
-            VERTEX = GL_VERTEX_SHADER,
-        };
-
-        Shader(Type type)
-        {
-            GL_CALL(handle_ = glCreateShader(static_cast<GLenum>(type)));
-        }
-
-        ~Shader()
-        {
-            GL_CALL(glDeleteShader(handle_));
-        }
-
-        Shader(Shader &&other) : Object{std::move(other)}
-        {
-        }
-
-        Shader &operator=(Shader &&other)
-        {
-            Object::operator=(std::move(other));
-            return *this;
-        }
-
-        std::string source() const
-        {
-            GLint param;
-            GL_CALL(glGetShaderiv(handle_, GL_SHADER_SOURCE_LENGTH, &param));
-
-            auto size = static_cast<GLsizei>(param);
-
-            std::string src{};
-            src.resize(static_cast<std::size_t>(size + 1));
-            GL_CALL(glGetShaderSource(handle_, size + 1, &size, src.data()));
-            src.resize(static_cast<std::size_t>(size));
-            return src;
-        }
-
-        Shader &source_path(const char *path)
-        {
-            return source(load_file(path));
-        }
-
-        Shader &source(std::string_view source)
-        {
-            const char *source_array[1] = {source.data()};
-            GLsizei length_array[1] = {static_cast<GLsizei>(source.size())};
-            GL_CALL(glShaderSource(handle_, 1, source_array, length_array));
-            return *this;
-        }
-
-        Shader &compile()
-        {
-            GL_CALL(glCompileShader(handle_));
-            return *this;
-        }
-
-    private:
-        // TODO
-        static std::string load_file(const char *path)
-        {
-            FILE *f = fopen(path, "rb");
-
-            struct stat st;
-            fstat(fileno(f), &st);
-
-            std::string contents;
-            contents.resize(st.st_size);
-
-            fread(contents.data(), sizeof(char), st.st_size, f);
-            fclose(f);
-
-            return contents;
-        }
+        FRAGMENT = GL_FRAGMENT_SHADER,
+        VERTEX = GL_VERTEX_SHADER,
     };
+
+    Shader(Type type);
+    ~Shader();
+    Shader(Shader&& other);
+    Shader& operator=(Shader&& other);
+
+    std::string_view source() const;
+
+    Shader& source_path(std::string_view path);
+    Shader& source(std::string_view source);
+    Shader& compile();
+
+private:
+    std::string source_;
+};
+
 } // namespace gl

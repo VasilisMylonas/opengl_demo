@@ -3,45 +3,46 @@
 #include <GL/glew.h>
 
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 
-#define GL_CALL(function)                                                                     \
-    function;                                                                                 \
-    for (GLenum _gl_error = glGetError(); _gl_error != GL_NO_ERROR; _gl_error = glGetError()) \
-    {                                                                                         \
-        std::cerr << "OpenGL error at " << __FILE__ << ":" << __LINE__ << " in "              \
-                  << __func__ << "() " << _gl_error << std::endl;                             \
-        assert(false);                                                                        \
+#define GL_CALL(function)                                                                          \
+    function;                                                                                      \
+    for (GLenum _gl_error = glGetError(); _gl_error != GL_NO_ERROR; _gl_error = glGetError())      \
+    {                                                                                              \
+        std::cerr << "OpenGL error at " << __FILE__ << ":" << __LINE__ << " in " << __func__       \
+                  << "() " << _gl_error << std::endl;                                              \
+        assert(false);                                                                             \
     }
 
 namespace gl
 {
-    class Object
+class Object
+{
+protected:
+    unsigned int handle_;
+    Object() = default;
+    Object(const Object&) = delete;
+    Object& operator=(const Object&) = delete;
+
+public:
+    Object(Object&& other)
     {
-    protected:
-        unsigned int handle_;
-        Object() = default;
-        Object(const Object &) = delete;
-        Object &operator=(const Object &) = delete;
+        handle_ = other.handle_;
+        other.handle_ = 0;
+    }
 
-    public:
-        Object(Object &&other)
-        {
-            handle_ = other.handle_;
-            other.handle_ = 0;
-        }
+    Object& operator=(Object&& other)
+    {
+        handle_ = other.handle_;
+        other.handle_ = 0;
+        return *this;
+    }
 
-        Object &operator=(Object &&other)
-        {
-            handle_ = other.handle_;
-            other.handle_ = 0;
-            return *this;
-        }
-
-        unsigned int handle() const
-        {
-            return handle_;
-        }
-    };
+    unsigned int handle() const
+    {
+        return handle_;
+    }
+};
 
 } // namespace gl
