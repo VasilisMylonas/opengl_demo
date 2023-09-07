@@ -3,26 +3,44 @@
 #include "logger.hpp"
 #include "window.hpp"
 
-#include <string>
-#include <string_view>
+#include <memory>
+#include <type_traits>
 
 class Application
 {
 private:
     Logger logger_;
     int argc_;
-    const char **argv_;
-    static void on_glfw_error(int error, const char *description);
-
-protected:
-    virtual Window init() = 0;
-    virtual void render();
-    virtual void logic();
-    virtual void input();
+    const char** argv_;
+    static Application* current_;
+    static void on_glfw_error(int error, const char* description);
 
 public:
-    Application(int argc, const char *argv[]);
+    template <typename T, typename = std::enable_if_t<std::is_base_of_v<Window, T>>>
+    void start()
+    {
+        std::unique_ptr<Window> window = std::make_unique<T>();
+        window->make_current();
+
+        // TODO
+        // logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
+        // logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+
+        while (!window->should_close())
+        {
+            poll_events();
+            window->render();
+            window->swap_buffers();
+        }
+    }
+
+    static Application& current();
+    void poll_events() const;
+    Application(int argc, const char* argv[]);
+    Application(const Application& other) = delete;
+    Application(Application&& other) = delete; // TODO: move is valid
+    Application& operator=(const Application& other) = delete;
+    Application& operator=(Application&& other) = delete; // TODO: move is valid
     virtual ~Application();
-    void start();
-    const Logger &logger() const;
+    const Logger& logger() const;
 };

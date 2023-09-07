@@ -31,13 +31,13 @@ enum class BufferAccess
     READ_WRITE = GL_READ_WRITE,
 };
 
-template <class T, BufferTarget U>
+template <typename T, BufferTarget U>
 class Buffer : public Object
 {
 public:
     friend class VertexArray;
 
-    template <class TOther, BufferTarget UOther>
+    template <typename TOther, BufferTarget UOther>
     explicit Buffer(Buffer<TOther, UOther>&& other) : Object{std::move(other)}
     {
     }

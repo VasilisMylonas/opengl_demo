@@ -7,12 +7,12 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-const Logger &Application::logger() const
+const Logger& Application::logger() const
 {
     return logger_;
 }
 
-Application::Application(int argc, const char *argv[])
+Application::Application(int argc, const char* argv[])
     : logger_{std::clog, "Application"}, argc_{argc}, argv_{argv}
 {
     if (!glfwInit())
@@ -21,14 +21,22 @@ Application::Application(int argc, const char *argv[])
     }
 
     glfwSetErrorCallback(on_glfw_error);
+
+    if (current_)
+    {
+        // TODO: error there can only be one application running
+    }
+
+    current_ = this;
 }
 
 Application::~Application()
 {
     glfwTerminate();
+    current_ = nullptr;
 }
 
-void Application::on_glfw_error(int error, const char *description)
+void Application::on_glfw_error(int error, const char* description)
 {
     (void)error;
     (void)description;
@@ -36,32 +44,19 @@ void Application::on_glfw_error(int error, const char *description)
     // logger_.error(description);
 }
 
-void Application::render()
+void Application::poll_events() const
 {
+    glfwPollEvents();
 }
 
-void Application::logic()
+Application& Application::current()
 {
-}
-
-void Application::input()
-{
-}
-
-void Application::start()
-{
-    Window window = init();
-    window.make_current();
-
-    logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
-    logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
-
-    while (!window.should_close())
+    if (!current_)
     {
-        glfwPollEvents();
-        input();
-        logic();
-        render();
-        window.swap_buffers();
+        // TODO: error
     }
+
+    return *current_;
 }
+
+Application* Application::current_;

@@ -21,12 +21,12 @@
 
 using namespace gl;
 
-class App : public Application
+class MainWindow : public Window
 {
 private:
-    std::optional<VertexBuffer> vbo;
-    std::optional<IndexBuffer> ibo;
-    std::optional<VertexArray> vao;
+    VertexBuffer vbo{4, BufferUsage::DYNAMIC_DRAW};
+    IndexBuffer ibo{6, BufferUsage::DYNAMIC_DRAW};
+    VertexArray vao{};
 
     FpsCounter counter{};
     Timer timer{};
@@ -56,28 +56,6 @@ private:
         2,
     };
 
-protected:
-    virtual Window init() override
-    {
-        Window window{1000, 400, "Pong"};
-        window.make_current();
-
-        // glEnable(GL_BLEND);
-        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        reload_shaders();
-
-        vbo.emplace(4, BufferUsage::DYNAMIC_DRAW);
-        ibo.emplace(6, BufferUsage::DYNAMIC_DRAW);
-        vao.emplace();
-
-        vao->buffers(*vbo, *ibo);
-        vbo->data(4, vertices.data());
-        ibo->data(3, indices.data());
-
-        return window;
-    }
-
     void reload_shaders()
     {
         Shader fs{Shader::Type::FRAGMENT};
@@ -90,11 +68,12 @@ protected:
         // .detach(fs).detach(vs);
     }
 
+public:
     virtual void render() override
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        logger().info("%.2lffps", counter.fps());
+        Application::current().logger().info("%.2lffps", counter.fps());
 
         if (timer.delta() > 1)
         {
@@ -102,12 +81,19 @@ protected:
             timer.reset();
         }
 
-        vao->draw(3);
+        vao.draw(3);
     }
 
-public:
-    App(int argc, const char* argv[]) : Application(argc, argv)
+    MainWindow() : Window{1000, 400, "Pong"}
     {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        reload_shaders();
+
+        vao.buffers(vbo, ibo);
+        vbo.data(4, vertices.data());
+        ibo.data(3, indices.data());
     }
 };
 
@@ -131,6 +117,6 @@ int main(int argc, const char* argv[])
 
     cmdline.usage(options, "Program Description");
 
-    App app{argc, argv};
-    app.start();
+    Application app{argc, argv};
+    app.start<MainWindow>();
 }

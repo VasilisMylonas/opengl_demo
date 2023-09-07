@@ -35,6 +35,8 @@ Window::Window(int width, int height, const char* title)
 
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
     on_resize_internal(handle_, width, height);
+
+    make_current();
 }
 
 Window::Window(Window&& other)
