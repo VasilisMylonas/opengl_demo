@@ -1,7 +1,8 @@
 #pragma once
 
-#include "gl/object.hpp"
+#include "gl/uniform.hpp"
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -24,9 +25,11 @@ public:
 
     std::string_view source() const;
 
-    Shader& source_path(std::string_view path);
+    Shader& source_path(const std::string& path);
     Shader& source(std::string_view source);
     Shader& compile();
+
+    std::optional<Uniform> uniform(const std::string& name) const;
 
 private:
     std::string source_;

@@ -5,6 +5,18 @@
 namespace gl
 {
 
+std::optional<Uniform> Shader::uniform(const std::string& name) const
+{
+    GL_CALL(int location = glGetUniformLocation(handle_, name.c_str()));
+
+    if (location == -1)
+    {
+        return {};
+    }
+
+    return Uniform{handle_, static_cast<unsigned int>(location)};
+}
+
 Shader::Shader(Type type)
 {
     GL_CALL(handle_ = glCreateShader(static_cast<GLenum>(type)));
@@ -30,7 +42,7 @@ std::string_view Shader::source() const
     return source_;
 }
 
-Shader& Shader::source_path(std::string_view path)
+Shader& Shader::source_path(const std::string& path)
 {
     source_ = read_file(path);
     return *this;

@@ -24,11 +24,9 @@ bool Convert::to_bool(std::string_view value)
 }
 
 // TODO
-std::string read_file(std::string_view path)
+std::string read_file(const std::string& path)
 {
-    std::string path_str{path};
-
-    FILE* f = fopen(path_str.c_str(), "rb");
+    FILE* f = fopen(path.c_str(), "rb");
 
     struct stat st;
     fstat(fileno(f), &st);

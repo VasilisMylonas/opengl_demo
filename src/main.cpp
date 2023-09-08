@@ -17,6 +17,7 @@
 #include "gl/buffer.hpp"
 #include "gl/program.hpp"
 #include "gl/shader.hpp"
+#include "gl/uniform.hpp"
 #include "gl/vertex_array.hpp"
 
 using namespace gl;
