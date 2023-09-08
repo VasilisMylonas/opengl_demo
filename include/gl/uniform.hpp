@@ -27,14 +27,11 @@ public:
 
     // TODO: getters
 
+protected:
+    Uniform(unsigned int program, unsigned int handle);
+
 private:
     unsigned int program_;
-
-    Uniform(unsigned int program, unsigned int handle)
-    {
-        program_ = program;
-        handle_ = handle;
-    }
 };
 
 } // namespace gl

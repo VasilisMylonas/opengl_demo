@@ -5,7 +5,7 @@
 namespace gl
 {
 
-Shader::Shader(Type type)
+Shader::Shader(Type type) : Object{0}
 {
     GL_CALL(handle_ = glCreateShader(static_cast<GLenum>(type)));
 }

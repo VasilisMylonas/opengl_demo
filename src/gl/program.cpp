@@ -3,7 +3,7 @@
 namespace gl
 {
 
-Program::Program()
+Program::Program() : Object{0}
 {
     GL_CALL(handle_ = glCreateProgram());
 }

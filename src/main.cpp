@@ -8,14 +8,13 @@
 #include <glm/mat4x4.hpp>
 #include <glm/matrix.hpp>
 
-#include "config.hpp"
-
 #include "application.hpp"
 #include "cmdline.hpp"
 #include "fps_counter.hpp"
 
 #include "gl/buffer.hpp"
 #include "gl/program.hpp"
+#include "gl/renderer.hpp"
 #include "gl/shader.hpp"
 #include "gl/uniform.hpp"
 #include "gl/vertex_array.hpp"
@@ -65,14 +64,13 @@ private:
         vs.source_path("../shaders/shader.vs").compile();
 
         Program program{};
-        program.attach(vs).attach(fs).link().use();
-        // .detach(fs).detach(vs);
+        program.attach(vs).attach(fs).link().use().detach(fs).detach(vs);
     }
 
 public:
     virtual void render() override
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        Renderer::clear();
 
         Application::current().logger().info("%.2lffps", counter.fps());
 
@@ -82,13 +80,12 @@ public:
             timer.reset();
         }
 
-        vao.draw(3);
+        Renderer::draw(vao, 3);
     }
 
     MainWindow() : Window{1000, 400, "Pong"}
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Renderer::enable_blending();
 
         reload_shaders();
 

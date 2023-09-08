@@ -11,6 +11,8 @@ using IndexBuffer = gl::Buffer<unsigned int, gl::BufferTarget::INDEX>;
 class VertexArray : public Object
 {
 public:
+    friend class Renderer;
+
     VertexArray();
     ~VertexArray();
 
@@ -18,7 +20,6 @@ public:
     VertexArray& operator=(VertexArray&& other);
 
     VertexArray& buffers(const VertexBuffer& vbo, const IndexBuffer& ibo);
-    void draw(std::size_t count);
 
 protected:
     void bind() const;

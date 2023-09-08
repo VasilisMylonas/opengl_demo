@@ -1,5 +1,0 @@
-#pragma once
-
-// clang-format off
-
-#define FPS_SAMPLE_INTERVAL 0.5

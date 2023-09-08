@@ -52,7 +52,7 @@ public:
         return *this;
     }
 
-    Buffer(std::size_t count, BufferUsage usage)
+    Buffer(std::size_t count, BufferUsage usage) : Object{0}
     {
         GL_CALL(glGenBuffers(1, &handle_));
 

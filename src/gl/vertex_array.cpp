@@ -2,7 +2,7 @@
 
 namespace gl
 {
-VertexArray::VertexArray()
+VertexArray::VertexArray() : Object{0}
 {
     GL_CALL(glGenVertexArrays(1, &handle_));
 }
@@ -48,13 +48,6 @@ VertexArray& VertexArray::buffers(const VertexBuffer& vbo, const IndexBuffer& ib
 VertexArray::~VertexArray()
 {
     GL_CALL(glDeleteVertexArrays(1, &handle_));
-}
-
-void VertexArray::draw(std::size_t count)
-{
-    bind();
-    GL_CALL(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(count), GL_UNSIGNED_INT, nullptr));
-    unbind();
 }
 
 void VertexArray::bind() const

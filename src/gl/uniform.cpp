@@ -35,4 +35,9 @@ Uniform& Uniform::operator=(Uniform&& other)
     return *this;
 }
 
+Uniform::Uniform(unsigned int program, unsigned int handle) : Object{handle}
+{
+    program_ = program;
+}
+
 } // namespace gl

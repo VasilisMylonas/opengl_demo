@@ -1,11 +1,9 @@
 #include "application.hpp"
 
-#include "config.hpp"
+#include "gl/renderer.hpp"
 
-#include <iostream>
-
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 const Logger& Application::logger() const
 {
@@ -65,8 +63,8 @@ Application& Application::current()
 
 void Application::main_loop(Window& window)
 {
-    logger().info("OpenGL Version: %s", glGetString(GL_VERSION));
-    logger().info("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+    logger().info("OpenGL Version: %s", gl::Renderer::version());
+    logger().info("OpenGL Renderer: %s", gl::Renderer::name());
 
     while (!window.should_close())
     {
