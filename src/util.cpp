@@ -1,27 +1,27 @@
 #include "util.hpp"
 
-#include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <sys/stat.h>
 
-std::string Convert::to_lower(std::string_view value)
-{
-    std::string result{value};
+// #include <algorithm>
+// std::string Convert::to_lower(std::string_view value)
+// {
+//     std::string result{value};
 
-    std::transform(result.begin(),
-                   result.end(),
-                   result.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+//     std::transform(result.begin(),
+//                    result.end(),
+//                    result.begin(),
+//                    [](unsigned char c) { return std::tolower(c); });
 
-    return result;
-}
+//     return result;
+// }
 
-bool Convert::to_bool(std::string_view value)
-{
-    std::string s = to_lower(value);
-    return s == "true" || s == "yes" || s == "on" || s == "1" || s == "y";
-}
+// bool Convert::to_bool(std::string_view value)
+// {
+//     std::string s = to_lower(value);
+//     return s == "true" || s == "yes" || s == "on" || s == "1" || s == "y";
+// }
 
 // TODO
 std::string read_file(const std::string& path)

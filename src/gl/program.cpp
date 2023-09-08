@@ -56,4 +56,16 @@ Program& Program::use()
     return *this;
 }
 
+std::optional<Uniform> Program::uniform(const std::string& name) const
+{
+    GL_CALL(int location = glGetUniformLocation(handle_, name.c_str()));
+
+    if (location == -1)
+    {
+        return {};
+    }
+
+    return Uniform{handle_, static_cast<unsigned int>(location)};
+}
+
 } // namespace gl

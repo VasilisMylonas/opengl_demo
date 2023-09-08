@@ -1,7 +1,8 @@
 #pragma once
 
 #include "gl/object.hpp"
-#include "glm/glm.hpp"
+
+#include <glm/glm.hpp>
 
 namespace gl
 {
@@ -9,16 +10,22 @@ namespace gl
 class Uniform : public Object
 {
 public:
-    friend class Shader;
+    friend class Program;
 
-    void set(float v0);
-    void set(float v0, float v1);
-    void set(float v0, float v1, float v2);
-    void set(float v0, float v1, float v2, float v3);
+    Uniform(Uniform&& other);
+    Uniform& operator=(Uniform&& other);
+
+    Uniform(const Uniform&) = delete;
+    Uniform& operator=(const Uniform&) = delete;
+
     void set(const glm::vec1& vec);
     void set(const glm::vec2& vec);
     void set(const glm::vec3& vec);
     void set(const glm::vec4& vec);
+
+    // TODO: more types
+
+    // TODO: getters
 
 private:
     unsigned int program_;
