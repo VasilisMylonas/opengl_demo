@@ -136,11 +136,10 @@ bool CmdLine::getopt(Option& option) const
         return true;
     }
 
-    auto short_key = option.short_key();
+    char short_key = option.short_key();
     if (short_key)
     {
-        char temp = short_key.value();
-        if (set_if_key_exists(option, {&temp, 1}))
+        if (set_if_key_exists(option, {&short_key, 1}))
         {
             return true;
         }

@@ -1,6 +1,6 @@
 #include "option.hpp"
 
-const std::optional<char>& Option::short_key() const
+char Option::short_key() const
 {
     return short_key_;
 }
@@ -22,7 +22,7 @@ std::string Option::make_short_string() const
     if (short_key_)
     {
         short_option += '-';
-        short_option += short_key_.value();
+        short_option += short_key_;
         short_option += ',';
     }
     else
@@ -38,12 +38,6 @@ std::string Option::make_long_string(std::size_t size) const
     std::string long_option{"--"};
 
     long_option += long_key_;
-
-    if (has_arg_)
-    {
-        long_option += "=<VALUE>";
-    }
-
     long_option.resize(size, ' ');
     return long_option;
 }
@@ -55,25 +49,20 @@ std::string Option::make_description_string(std::size_t size) const
     return descr;
 }
 
-Option::Option(std::string_view long_key, std::string_view description, bool has_arg)
-    : long_key_{long_key}, description_{description}, has_arg_{has_arg}
-{
-}
-
 Option::Option(char short_key,
                std::string_view long_key,
                std::string_view description,
-               bool has_arg)
-    : short_key_{short_key}, long_key_{long_key}, description_{description}, has_arg_{has_arg}
+               void* argument,
+               Setter* setter)
+    : short_key_{short_key},
+      long_key_{long_key},
+      description_{description},
+      argument_{argument},
+      set_{setter}
 {
 }
 
-const std::optional<std::string>& Option::value() const
+void Option::set_value(std::string_view value) const
 {
-    return value_;
-}
-
-void Option::set_value(std::string_view value)
-{
-    value_ = value;
+    set_(value, argument_);
 }

@@ -95,10 +95,17 @@ public:
     }
 };
 
+struct
+{
+    bool show_fps;
+    bool show_version;
+    int lock_fps;
+} program_options;
+
 std::array<Option, 3> options = {
-    Option{"show-fps", "Show FPS overlay", false},
-    Option{"lock-fps", "Set maximum FPS (default is unlimited)", true},
-    Option{'V', "version", "Print program version", false},
+    make_option(0, "show-fps", "Show FPS overlay", program_options.show_fps),
+    make_option(0, "lock-fps", "Set maximum FPS (default is unlimited)", program_options.lock_fps),
+    make_option('V', "version", "Print program version", program_options.show_version),
 };
 
 int main(int argc, const char* argv[])
@@ -115,6 +122,9 @@ int main(int argc, const char* argv[])
 
     cmdline.usage(options, "Program Description");
 
-    Application app{argc, argv};
-    app.start<MainWindow>();
+    assert(program_options.show_fps);
+    assert(program_options.show_version);
+
+    // Application app{argc, argv};
+    // app.start<MainWindow>();
 }
