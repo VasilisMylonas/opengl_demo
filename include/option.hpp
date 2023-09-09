@@ -4,6 +4,7 @@
 
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 class Option
 {
@@ -14,7 +15,8 @@ public:
            std::string_view long_key,
            std::string_view description,
            void* argument,
-           Setter* setter);
+           Setter* setter,
+           bool is_flag);
 
     char short_key() const;
     std::string_view description() const;
@@ -31,6 +33,7 @@ private:
     std::string description_;
     void* argument_;
     Setter* set_;
+    bool is_flag_;
 };
 
 template <typename T>
@@ -48,5 +51,6 @@ Option make_option(char short_key, std::string_view long_key, std::string_view d
         description,
         reinterpret_cast<void*>(&arg),
         setter<T>,
+        std::is_same_v<T, bool>,
     };
 }

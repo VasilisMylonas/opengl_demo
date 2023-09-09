@@ -38,6 +38,12 @@ std::string Option::make_long_string(std::size_t size) const
     std::string long_option{"--"};
 
     long_option += long_key_;
+
+    if (!is_flag_)
+    {
+        long_option += "=<VALUE>";
+    }
+
     long_option.resize(size, ' ');
     return long_option;
 }
@@ -53,12 +59,14 @@ Option::Option(char short_key,
                std::string_view long_key,
                std::string_view description,
                void* argument,
-               Setter* setter)
+               Setter* setter,
+               bool is_flag)
     : short_key_{short_key},
       long_key_{long_key},
       description_{description},
       argument_{argument},
-      set_{setter}
+      set_{setter},
+      is_flag_{is_flag}
 {
 }
 

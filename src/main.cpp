@@ -122,9 +122,6 @@ int main(int argc, const char* argv[])
 
     cmdline.usage(options, "Program Description");
 
-    assert(program_options.show_fps);
-    assert(program_options.show_version);
-
     // Application app{argc, argv};
     // app.start<MainWindow>();
 }
