@@ -9,7 +9,7 @@
 #include <glm/matrix.hpp>
 
 #include "application.hpp"
-#include "cmdline.hpp"
+#include "command_line.hpp"
 #include "fps_counter.hpp"
 
 #include "gl/buffer.hpp"
@@ -97,30 +97,30 @@ public:
 
 struct
 {
-    bool show_fps;
-    bool show_version;
-    int lock_fps;
+    std::optional<bool> show_fps{false};
+    std::optional<bool> show_version;
+    std::optional<int> lock_fps;
 } program_options;
 
-std::array<Option, 3> options = {
-    make_option(0, "show-fps", "Show FPS overlay", program_options.show_fps),
-    make_option(0, "lock-fps", "Set maximum FPS (default is unlimited)", program_options.lock_fps),
+std::array<CommandLine::Option, 3> options = {
+    make_option("show-fps", "Show FPS overlay", program_options.show_fps),
+    make_option("lock-fps", "Set maximum FPS (default is unlimited)", program_options.lock_fps),
     make_option('V', "version", "Print program version", program_options.show_version),
 };
 
 int main(int argc, const char* argv[])
 {
-    CmdLine cmdline{argc, argv};
+    CommandLine cmdline{argc, argv};
 
-    for (Option& option : options)
+    for (auto& option : options)
     {
-        if (cmdline.getopt(option))
-        {
-            // TODO
-        }
+        cmdline.getopt(option);
     }
 
     cmdline.usage(options, "Program Description");
+
+    // std::cout << program_options.show_fps.value() << std::endl;
+    // std::cout << program_options.lock_fps.value_or(0) << std::endl;
 
     // Application app{argc, argv};
     // app.start<MainWindow>();
