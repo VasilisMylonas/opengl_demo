@@ -10,12 +10,13 @@ namespace gl
 class Texture : public Object
 {
 public:
+    friend class Renderer;
+
     Texture();
     ~Texture();
     void source_path(const std::string& path);
 
-    // TODO
-    // protected:
+protected:
     void bind() const;
     void unbind() const;
 };

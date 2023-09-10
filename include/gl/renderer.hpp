@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gl/texture.hpp"
 #include "gl/vertex_array.hpp"
 
 namespace gl
@@ -27,6 +28,18 @@ public:
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    static void draw_texture(const Texture& texture,
+                             const VertexArray& vao,
+                             std::size_t count,
+                             unsigned int slot = 0)
+    {
+        // TODO: active texture
+        GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
+        texture.bind();
+        draw(vao, count);
+        texture.unbind();
     }
 
     static void draw(const VertexArray& vao, std::size_t count)

@@ -33,22 +33,22 @@ private:
     std::array<gl::Vertex, 4> vertices = {
         gl::Vertex{
             .position = {0.5, 0.5, 0},
-            .color = {1, 1, 1, 1},
+            .color = {1, 0, 0, 1},
             .uv = {1, 1},
         },
         gl::Vertex{
             .position = {0.5, -0.5, 0},
-            .color = {1, 1, 1, 1},
+            .color = {0, 1, 0, 1},
             .uv = {1, 0},
         },
         gl::Vertex{
             .position = {-0.5, -0.5, 0},
-            .color = {1, 1, 1, 1},
+            .color = {0, 0, 1, 1},
             .uv = {0, 0},
         },
         gl::Vertex{
             .position = {-0.5, 0.5, 0},
-            .color = {1, 1, 1, 1},
+            .color = {1, 0, 1, 1},
             .uv = {0, 1},
         },
     };
@@ -75,7 +75,7 @@ private:
 
     void load_textures()
     {
-        tex.source_path("../image.png");
+        tex.source_path("../op.jpeg");
     }
 
 public:
@@ -91,11 +91,8 @@ public:
             timer.reset();
         }
 
-        GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
-        tex.bind();
         u_texture->set(0);
-        gl::Renderer::draw(vao, 6);
-        tex.unbind();
+        gl::Renderer::draw_texture(tex, vao, 6, 0);
     }
 
     MainWindow() : Window{1000, 400, "Pong"}

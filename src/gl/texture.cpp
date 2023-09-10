@@ -20,6 +20,8 @@ Texture::Texture() : Object{0}
 
 void Texture::source_path(const std::string& path)
 {
+    stbi_set_flip_vertically_on_load_thread(true);
+
     int x, y, c;
     unsigned char* data = stbi_load(path.c_str(), &x, &y, &c, 4);
 
@@ -27,6 +29,7 @@ void Texture::source_path(const std::string& path)
 
     bind();
 
+    // TODO
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
