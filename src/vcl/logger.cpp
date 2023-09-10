@@ -11,15 +11,15 @@ std::string_view Logger::level_to_str(Level level)
 {
     switch (level)
     {
-    case Level::TRACE:
+    case Level::trace:
         return "TRACE";
-    case Level::DEBUG:
+    case Level::debug:
         return "DEBUG";
-    case Level::INFO:
+    case Level::info:
         return "INFO";
-    case Level::WARN:
+    case Level::warn:
         return "WARN";
-    case Level::ERROR:
+    case Level::error:
         return "ERROR";
     }
 
@@ -49,7 +49,7 @@ void Logger::trace(const char* format, ...) const
 {
     std::va_list args;
     va_start(args, format);
-    log(Level::TRACE, format, args);
+    log(Level::trace, format, args);
     va_end(args);
 }
 
@@ -57,7 +57,7 @@ void Logger::debug(const char* format, ...) const
 {
     std::va_list args;
     va_start(args, format);
-    log(Level::DEBUG, format, args);
+    log(Level::debug, format, args);
     va_end(args);
 }
 
@@ -65,7 +65,7 @@ void Logger::info(const char* format, ...) const
 {
     std::va_list args;
     va_start(args, format);
-    log(Level::INFO, format, args);
+    log(Level::info, format, args);
     va_end(args);
 }
 
@@ -73,7 +73,7 @@ void Logger::warn(const char* format, ...) const
 {
     std::va_list args;
     va_start(args, format);
-    log(Level::WARN, format, args);
+    log(Level::warn, format, args);
     va_end(args);
 }
 
@@ -81,7 +81,7 @@ void Logger::error(const char* format, ...) const
 {
     std::va_list args;
     va_start(args, format);
-    log(Level::ERROR, format, args);
+    log(Level::error, format, args);
     va_end(args);
 }
 

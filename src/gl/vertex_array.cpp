@@ -29,6 +29,7 @@ VertexArray& VertexArray::buffers(const VertexBuffer& vbo, const IndexBuffer& ib
     GL_CALL(glEnableVertexArrayAttrib(handle_, 1));
     GL_CALL(glEnableVertexArrayAttrib(handle_, 2));
     GL_CALL(glEnableVertexArrayAttrib(handle_, 3));
+    GL_CALL(glEnableVertexArrayAttrib(handle_, 4));
 
     GL_CALL(glVertexAttribPointer(0,
                                   3,
@@ -42,6 +43,12 @@ VertexArray& VertexArray::buffers(const VertexBuffer& vbo, const IndexBuffer& ib
         2, 4, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, color))));
     GL_CALL(glVertexAttribPointer(
         3, 2, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv))));
+    GL_CALL(glVertexAttribPointer(4,
+                                  1,
+                                  GL_UNSIGNED_INT,
+                                  false,
+                                  sizeof(Vertex),
+                                  reinterpret_cast<void*>(offsetof(Vertex, texture))));
 
     unbind();
     vbo.unbind();

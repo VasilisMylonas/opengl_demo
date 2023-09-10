@@ -5,8 +5,8 @@
 
 namespace gl
 {
-using VertexBuffer = gl::Buffer<Vertex, gl::BufferTarget::ARRAY>;
-using IndexBuffer = gl::Buffer<unsigned int, gl::BufferTarget::INDEX>;
+using VertexBuffer = gl::Buffer<Vertex, gl::BufferTarget::array>;
+using IndexBuffer = gl::Buffer<unsigned int, gl::BufferTarget::index>;
 
 class VertexArray : public Object
 {

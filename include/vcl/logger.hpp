@@ -12,14 +12,14 @@ class Logger
 public:
     enum class Level
     {
-        TRACE,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
+        trace,
+        debug,
+        info,
+        warn,
+        error,
     };
 
-    Logger(std::ostream& stream, std::string_view source, Level level = Level::INFO);
+    Logger(std::ostream& stream, std::string_view source, Level level = Level::info);
     ~Logger();
     Logger(Logger&& other);
     Logger& operator=(Logger&& other);

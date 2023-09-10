@@ -24,6 +24,7 @@ public:
     void set(const glm::vec4& vec);
 
     void set(int value);
+    void set(std::size_t count, const int* values);
 
     // TODO: more types
 

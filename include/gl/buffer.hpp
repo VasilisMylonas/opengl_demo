@@ -6,29 +6,29 @@ namespace gl
 {
 enum class BufferUsage
 {
-    STATIC_DRAW = GL_STATIC_DRAW,
-    DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
-    STREAM_DRAW = GL_STREAM_DRAW,
-    STATIC_READ = GL_STATIC_READ,
-    DYNAMIC_READ = GL_DYNAMIC_READ,
-    STREAM_READ = GL_STREAM_READ,
-    STATIC_COPY = GL_STATIC_COPY,
-    DYNAMIC_COPY = GL_DYNAMIC_COPY,
-    STREAM_COPY = GL_STREAM_COPY,
+    static_draw = GL_STATIC_DRAW,
+    dynamic_draw = GL_DYNAMIC_DRAW,
+    stream_draw = GL_STREAM_DRAW,
+    static_read = GL_STATIC_READ,
+    dynamic_read = GL_DYNAMIC_READ,
+    stream_read = GL_STREAM_READ,
+    static_copy = GL_STATIC_COPY,
+    dynamic_copy = GL_DYNAMIC_COPY,
+    stream_copy = GL_STREAM_COPY,
 };
 
 enum class BufferTarget
 {
-    INDEX = GL_ELEMENT_ARRAY_BUFFER,
-    ARRAY = GL_ARRAY_BUFFER,
-    TEXTURE = GL_TEXTURE_BUFFER,
+    index = GL_ELEMENT_ARRAY_BUFFER,
+    array = GL_ARRAY_BUFFER,
+    texture = GL_TEXTURE_BUFFER,
 };
 
 enum class BufferAccess
 {
-    READ_ONLY = GL_READ_ONLY,
-    WRITE_ONLY = GL_WRITE_ONLY,
-    READ_WRITE = GL_READ_WRITE,
+    read_only = GL_READ_ONLY,
+    write_only = GL_WRITE_ONLY,
+    read_write = GL_READ_WRITE,
 };
 
 template <typename T, BufferTarget U>

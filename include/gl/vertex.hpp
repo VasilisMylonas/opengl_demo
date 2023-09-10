@@ -11,6 +11,7 @@ struct Vertex
     glm::vec3 normal{0, 0, 1};
     glm::vec4 color{1, 1, 1, 0};
     glm::vec2 uv{0, 0};
+    unsigned int texture{0};
 };
 
 } // namespace gl

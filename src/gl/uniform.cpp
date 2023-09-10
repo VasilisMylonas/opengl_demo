@@ -28,6 +28,12 @@ void Uniform::set(int value)
     GL_CALL(glProgramUniform1i(program_, static_cast<int>(handle_), value));
 }
 
+void Uniform::set(std::size_t count, const int* values)
+{
+    GL_CALL(glProgramUniform1iv(
+        program_, static_cast<int>(handle_), static_cast<GLsizei>(count), values));
+}
+
 Uniform::Uniform(Uniform&& other) : Object{std::move(other)}
 {
     program_ = other.program_;
