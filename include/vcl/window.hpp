@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 
 // From GLFW
@@ -14,6 +15,22 @@ private:
     GLFWwindow* handle_;
 
 public:
+    class ContextException : public std::runtime_error
+    {
+    public:
+        ContextException(const char* msg) : runtime_error{msg}
+        {
+        }
+    };
+
+    class CreationException : public std::runtime_error
+    {
+    public:
+        CreationException(const char* msg) : runtime_error{msg}
+        {
+        }
+    };
+
     virtual void render() = 0;
 
     std::pair<int, int> size() const;

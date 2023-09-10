@@ -35,7 +35,9 @@ Window::Window(int width, int height, const char* title)
     handle_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!handle_)
     {
-        // TODO: throw
+        const char* msg;
+        glfwGetError(&msg);
+        throw CreationException{msg};
     }
 
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
@@ -148,7 +150,8 @@ Window& Window::make_current()
     auto code = glewInit();
     if (code != GLEW_OK)
     {
-        // TODO: throw
+        auto msg = reinterpret_cast<const char*>(glewGetErrorString(code));
+        throw ContextException{msg};
     }
 
     return *this;

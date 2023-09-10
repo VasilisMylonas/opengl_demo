@@ -28,23 +28,12 @@ Application::Application(int argc, const char* argv[])
 {
     if (!glfwInit())
     {
-        // TODO: throw
+        const char* msg;
+        glfwGetError(&msg);
+        throw CreationException(msg);
     }
 
     glfwSetErrorCallback(on_glfw_error);
-
-    if (current_)
-    {
-        // TODO: error there can only be one application running
-    }
-
-    current_ = this;
-}
-
-Application::Application(Application&& other)
-    : logger_{std::move(other.logger_)}, command_line_{other.command_line_}
-{
-    current_ = this;
 }
 
 Application::~Application()
@@ -68,7 +57,7 @@ Application& Application::current()
 {
     if (!current_)
     {
-        // TODO: error
+        throw ContextException{"No currently running application instance."};
     }
 
     return *current_;

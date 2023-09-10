@@ -48,7 +48,6 @@ void CommandLine::getopt(Option& option)
 
     if (found == args_.end()) // Key not found
     {
-        // TODO: error
         return;
     }
 
@@ -61,7 +60,6 @@ void CommandLine::getopt(Option& option)
 
     if (found == args().end() || is_key(*found)) // No argument
     {
-        // TODO: error?
         return;
     }
 
