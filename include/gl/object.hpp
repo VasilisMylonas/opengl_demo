@@ -30,6 +30,9 @@ protected:
     // ! WARNING: weird bind behavior
     bool is_buffer() const;
 
+    // ! WARNING: weird bind behavior
+    bool is_texture() const;
+
     bool is_shader() const;
     bool is_program() const;
 

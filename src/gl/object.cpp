@@ -48,6 +48,11 @@ bool Object::is_vertex_array() const
     return glIsVertexArray(handle_);
 }
 
+bool Object::is_texture() const
+{
+    return glIsTexture(handle_);
+}
+
 bool Object::is_shader() const
 {
     return glIsShader(handle_);
