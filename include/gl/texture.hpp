@@ -14,7 +14,8 @@ public:
     ~Texture();
     void source_path(const std::string& path);
 
-protected:
+    // TODO
+    // protected:
     void bind() const;
     void unbind() const;
 };

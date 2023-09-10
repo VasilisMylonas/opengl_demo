@@ -1,5 +1,7 @@
 #include "gl/texture.hpp"
 
+#include <cassert>
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 
@@ -21,14 +23,16 @@ void Texture::source_path(const std::string& path)
     int x, y, c;
     unsigned char* data = stbi_load(path.c_str(), &x, &y, &c, 4);
 
+    assert(data != nullptr);
+
     bind();
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA8, GL_UNSIGNED_BYTE, data);
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
 
     unbind();
 
@@ -37,17 +41,17 @@ void Texture::source_path(const std::string& path)
 
 Texture::~Texture()
 {
-    glDeleteTextures(1, &handle_);
+    GL_CALL(glDeleteTextures(1, &handle_));
 }
 
 void Texture::bind() const
 {
-    glBindTexture(GL_TEXTURE_2D, handle_);
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, handle_));
 }
 
 void Texture::unbind() const
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 } // namespace gl

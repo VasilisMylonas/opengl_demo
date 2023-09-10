@@ -2,6 +2,12 @@
 
 layout(location = 0) out vec4 color_out;
 
-in vec4 interp_color;
+uniform sampler2D u_texture;
 
-void main() { color_out = interp_color; }
+in vec4 interp_color;
+in vec2 texture_coords;
+
+void main() 
+{ 
+    color_out = interp_color * texture(u_texture, texture_coords);
+}

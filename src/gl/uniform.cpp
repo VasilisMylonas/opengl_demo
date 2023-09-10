@@ -23,6 +23,11 @@ void Uniform::set(const glm::vec4& vec)
     GL_CALL(glProgramUniform4f(program_, static_cast<int>(handle_), vec.x, vec.y, vec.z, vec.w));
 }
 
+void Uniform::set(int value)
+{
+    GL_CALL(glProgramUniform1i(program_, static_cast<int>(handle_), value));
+}
+
 Uniform::Uniform(Uniform&& other) : Object{std::move(other)}
 {
     program_ = other.program_;

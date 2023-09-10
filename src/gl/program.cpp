@@ -25,7 +25,7 @@ Program& Program::operator=(Program&& other)
 
 bool Program::valid() const
 {
-    glValidateProgram(handle_);
+    GL_CALL(glValidateProgram(handle_));
 
     int status;
     GL_CALL(glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status));

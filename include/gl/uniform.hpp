@@ -23,6 +23,8 @@ public:
     void set(const glm::vec3& vec);
     void set(const glm::vec4& vec);
 
+    void set(int value);
+
     // TODO: more types
 
     // TODO: getters
