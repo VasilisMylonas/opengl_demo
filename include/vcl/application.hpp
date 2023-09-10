@@ -1,17 +1,20 @@
 #pragma once
 
+#include "command_line.hpp"
 #include "logger.hpp"
 #include "window.hpp"
 
 #include <memory>
 #include <type_traits>
 
+namespace vcl
+{
+
 class Application
 {
 private:
     Logger logger_;
-    int argc_;
-    const char** argv_;
+    CommandLine command_line_;
     static Application* current_;
     static void on_glfw_error(int error, const char* description);
 
@@ -28,6 +31,8 @@ public:
     }
 
     static Application& current();
+    const CommandLine& command_line() const;
+    CommandLine& command_line();
     void poll_events() const;
     Application(int argc, const char* argv[]);
     Application(const Application& other) = delete;
@@ -37,3 +42,5 @@ public:
     virtual ~Application();
     const Logger& logger() const;
 };
+
+} // namespace vcl

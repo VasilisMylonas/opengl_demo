@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <vector>
 
+namespace vcl
+{
+
 class CommandLine
 {
 public:
@@ -110,3 +113,5 @@ CommandLine::Option make_option(char short_key,
         std::is_same_v<T, bool>,
     };
 }
+
+} // namespace vcl

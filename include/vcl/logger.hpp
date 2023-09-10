@@ -4,6 +4,9 @@
 #include <ostream>
 #include <string_view>
 
+namespace vcl
+{
+
 class Logger
 {
 public:
@@ -42,3 +45,5 @@ private:
     std::ostream* stream_;
     Level level_;
 };
+
+} // namespace vcl

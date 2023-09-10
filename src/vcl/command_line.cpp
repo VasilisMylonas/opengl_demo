@@ -1,6 +1,9 @@
-#include "command_line.hpp"
+#include "vcl/command_line.hpp"
 
 #include <algorithm>
+
+namespace vcl
+{
 
 std::string_view CommandLine::program_name() const
 {
@@ -105,3 +108,5 @@ void CommandLine::Option::set_value(std::string_view value) const
 {
     set_(value, argument_);
 }
+
+} // namespace vcl

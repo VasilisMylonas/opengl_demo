@@ -1,17 +1,30 @@
-#include "application.hpp"
+#include "vcl/application.hpp"
 
 #include "gl/renderer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+namespace vcl
+{
+
 const Logger& Application::logger() const
 {
     return logger_;
 }
 
+const CommandLine& Application::command_line() const
+{
+    return command_line_;
+}
+
+CommandLine& Application::command_line()
+{
+    return command_line_;
+}
+
 Application::Application(int argc, const char* argv[])
-    : logger_{std::clog, "Application"}, argc_{argc}, argv_{argv}
+    : logger_{std::clog, "Application"}, command_line_{argc, argv}
 {
     if (!glfwInit())
     {
@@ -29,7 +42,7 @@ Application::Application(int argc, const char* argv[])
 }
 
 Application::Application(Application&& other)
-    : logger_{std::move(other.logger_)}, argc_{other.argc_}, argv_{other.argv_}
+    : logger_{std::move(other.logger_)}, command_line_{other.command_line_}
 {
     current_ = this;
 }
@@ -75,3 +88,5 @@ void Application::main_loop(Window& window)
 }
 
 Application* Application::current_;
+
+} // namespace vcl

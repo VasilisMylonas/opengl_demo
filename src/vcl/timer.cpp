@@ -1,6 +1,9 @@
-#include "timer.hpp"
+#include "vcl/timer.hpp"
 
 #include <GLFW/glfw3.h>
+
+namespace vcl
+{
 
 Timer::Timer()
 {
@@ -16,3 +19,5 @@ void Timer::reset()
 {
     t0_ = glfwGetTime();
 }
+
+} // namespace vcl

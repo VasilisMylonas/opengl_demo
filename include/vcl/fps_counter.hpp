@@ -2,6 +2,9 @@
 
 #include "timer.hpp"
 
+namespace vcl
+{
+
 class FpsCounter
 {
 private:
@@ -16,3 +19,5 @@ public:
     void sample_interval(double value);
     double fps();
 };
+
+} // namespace vcl

@@ -1,8 +1,13 @@
-#include "window.hpp"
+#include "vcl/window.hpp"
 
-#include <GL/glew.h>
+#include "gl/renderer.hpp"
+
 #include <GLFW/glfw3.h>
 
+namespace vcl
+{
+
+// TODO
 // static Window *get_wrapper(GLFWwindow *handle)
 // {
 //     return static_cast<Window *>(glfwGetWindowUserPointer(handle));
@@ -162,3 +167,5 @@ Window& Window::swap_interval(int interval)
     glfwMakeContextCurrent(previous);
     return *this;
 }
+
+} // namespace vcl

@@ -1,7 +1,10 @@
-#include "convert.hpp"
+#include "vcl/convert.hpp"
 
 #include <algorithm>
 #include <cctype>
+
+namespace vcl
+{
 
 std::string Convert::to_lower(std::string_view value)
 {
@@ -21,3 +24,5 @@ bool Convert::to<bool>(std::string_view value)
     std::string s = to_lower(value);
     return s == "true" || s == "yes" || s == "on" || s == "1" || s == "y";
 }
+
+} // namespace vcl

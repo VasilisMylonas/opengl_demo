@@ -1,8 +1,11 @@
-#include "logger.hpp"
+#include "vcl/logger.hpp"
 
 #include <cassert>
 #include <ctime>
 #include <iomanip>
+
+namespace vcl
+{
 
 std::string_view Logger::level_to_str(Level level)
 {
@@ -114,3 +117,5 @@ Logger::Level Logger::level() const
 {
     return level_;
 }
+
+} // namespace vcl

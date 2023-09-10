@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(notagame CXX)
 
-file(GLOB SRC src/*.cpp src/gl/*.cpp)
+file(GLOB SRC src/*.cpp src/gl/*.cpp src/vcl/*.cpp)
 
 add_executable(notagame ${SRC})
 target_include_directories(notagame PUBLIC include)

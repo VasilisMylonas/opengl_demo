@@ -1,5 +1,8 @@
 #pragma once
 
+namespace vcl
+{
+
 class Timer
 {
 private:
@@ -10,3 +13,5 @@ public:
     double delta() const;
     void reset();
 };
+
+} // namespace vcl

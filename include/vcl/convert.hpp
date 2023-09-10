@@ -3,6 +3,9 @@
 #include <string>
 #include <string_view>
 
+namespace vcl
+{
+
 class Convert
 {
 public:
@@ -15,3 +18,5 @@ public:
         return std::stoi(std::string{value}, &pos, 0);
     }
 };
+
+} // namespace vcl

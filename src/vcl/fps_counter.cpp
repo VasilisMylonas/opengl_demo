@@ -1,4 +1,7 @@
-#include "fps_counter.hpp"
+#include "vcl/fps_counter.hpp"
+
+namespace vcl
+{
 
 FpsCounter::FpsCounter(double sample_interval) : sample_interval_{sample_interval}
 {
@@ -29,3 +32,5 @@ double FpsCounter::fps()
 
     return fps_;
 }
+
+} // namespace vcl

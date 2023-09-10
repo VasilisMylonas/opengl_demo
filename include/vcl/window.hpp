@@ -2,10 +2,15 @@
 
 #include <utility>
 
+// From GLFW
+typedef struct GLFWwindow GLFWwindow;
+
+namespace vcl
+{
+
 class Window
 {
 private:
-    typedef struct GLFWwindow GLFWwindow;
     GLFWwindow* handle_;
 
 public:
@@ -35,3 +40,5 @@ public:
     Window& operator=(Window&& other);
     virtual ~Window();
 };
+
+} // namespace vcl
