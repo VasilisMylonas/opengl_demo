@@ -1,13 +1,13 @@
 #version 400
 
-layout(location = 0) out vec4 color_out;
+layout(location = 0) out vec4 out_color;
 
 uniform sampler2D u_texture;
 
-in vec4 interp_color;
-in vec2 texture_coords;
+in vec4 v_color;
+in vec2 v_uv;
 
 void main() 
 { 
-    color_out = interp_color * texture(u_texture, texture_coords);
+    out_color = v_color * texture(u_texture, v_uv);
 }

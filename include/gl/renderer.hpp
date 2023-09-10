@@ -30,13 +30,10 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    static void draw_texture(const Texture& texture,
-                             const VertexArray& vao,
-                             std::size_t count,
-                             unsigned int slot = 0)
+    static void draw_texture(const Texture& texture, const VertexArray& vao, std::size_t count)
     {
         // TODO: active texture
-        GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
+        texture.select();
         texture.bind();
         draw(vao, count);
         texture.unbind();

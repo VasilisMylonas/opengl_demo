@@ -23,9 +23,9 @@ private:
     gl::VertexBuffer vbo{4, gl::BufferUsage::DYNAMIC_DRAW};
     gl::IndexBuffer ibo{6, gl::BufferUsage::DYNAMIC_DRAW};
     gl::VertexArray vao{};
-    gl::Texture tex{};
+    gl::Texture tex{0};
     gl::Program program{};
-    std::optional<gl::Uniform> u_texture;
+    std::optional<gl::Uniform> u_texture{};
 
     vcl::FpsCounter counter{};
     vcl::Timer timer{};
@@ -92,7 +92,7 @@ public:
         }
 
         u_texture->set(0);
-        gl::Renderer::draw_texture(tex, vao, 6, 0);
+        gl::Renderer::draw_texture(tex, vao, 6);
     }
 
     MainWindow() : Window{1000, 400, "Pong"}

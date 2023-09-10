@@ -12,13 +12,21 @@ class Texture : public Object
 public:
     friend class Renderer;
 
-    Texture();
+    Texture(unsigned int slot);
     ~Texture();
-    void source_path(const std::string& path);
+    Texture& source_path(const std::string& path);
+    unsigned int slot() const;
+    Texture& slot(unsigned int slot);
+
+    // TODO: copy and move
 
 protected:
     void bind() const;
     void unbind() const;
+    void select() const;
+
+private:
+    unsigned int slot_;
 };
 
 } // namespace gl

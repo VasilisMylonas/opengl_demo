@@ -13,12 +13,12 @@
 namespace gl
 {
 
-Texture::Texture() : Object{0}
+Texture::Texture(unsigned int slot) : Object{0}, slot_{slot}
 {
     GL_CALL(glGenTextures(1, &handle_));
 }
 
-void Texture::source_path(const std::string& path)
+Texture& Texture::source_path(const std::string& path)
 {
     stbi_set_flip_vertically_on_load_thread(true);
 
@@ -27,6 +27,7 @@ void Texture::source_path(const std::string& path)
 
     assert(data != nullptr);
 
+    select();
     bind();
 
     // TODO
@@ -40,6 +41,19 @@ void Texture::source_path(const std::string& path)
     unbind();
 
     stbi_image_free(data);
+
+    return *this;
+}
+
+unsigned int Texture::slot() const
+{
+    return slot_;
+}
+
+Texture& Texture::slot(unsigned int slot)
+{
+    slot_ = slot;
+    return *this;
 }
 
 Texture::~Texture()
@@ -55,6 +69,11 @@ void Texture::bind() const
 void Texture::unbind() const
 {
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void Texture::select() const
+{
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + slot_));
 }
 
 } // namespace gl
