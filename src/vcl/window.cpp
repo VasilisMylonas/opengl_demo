@@ -7,15 +7,26 @@
 namespace vcl
 {
 
-// TODO
-// static Window *get_wrapper(GLFWwindow *handle)
-// {
-//     return static_cast<Window *>(glfwGetWindowUserPointer(handle));
-// }
-
-static void on_resize_internal(GLFWwindow* window, int width, int height)
+static Window* get_wrapper(GLFWwindow* handle)
 {
-    (void)window;
+    return static_cast<Window*>(glfwGetWindowUserPointer(handle));
+}
+
+void Window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
+{
+    auto self = get_wrapper(window);
+
+    self->scroll_dx_ = x_offset;
+    self->scroll_dy_ = y_offset;
+}
+
+std::pair<double, double> Window::scroll() const
+{
+    return {scroll_dx_, scroll_dy_};
+}
+
+void Window::on_resize_internal(GLFWwindow* window, int width, int height)
+{
     auto previous = glfwGetCurrentContext();
 
     glfwMakeContextCurrent(window);
@@ -23,7 +34,7 @@ static void on_resize_internal(GLFWwindow* window, int width, int height)
     glfwMakeContextCurrent(previous);
 }
 
-Window::Window(int width, int height, const char* title)
+Window::Window(int width, int height, const char* title) : scroll_dx_{0}, scroll_dy_{0}
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -43,12 +54,16 @@ Window::Window(int width, int height, const char* title)
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
     on_resize_internal(handle_, width, height);
 
+    glfwSetScrollCallback(handle_, on_mouse_scroll_internal);
+
     make_current();
 }
 
 Window::Window(Window&& other)
 {
     handle_ = other.handle_;
+    scroll_dx_ = other.scroll_dx_;
+    scroll_dy_ = other.scroll_dy_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
 }
@@ -56,6 +71,8 @@ Window::Window(Window&& other)
 Window& Window::operator=(Window&& other)
 {
     handle_ = other.handle_;
+    scroll_dx_ = other.scroll_dx_;
+    scroll_dy_ = other.scroll_dy_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
     return *this;
@@ -67,6 +84,11 @@ Window::~Window()
     {
         glfwDestroyWindow(handle_);
     }
+}
+
+GLFWwindow* Window::handle() const
+{
+    return handle_;
 }
 
 std::pair<int, int> Window::size() const
