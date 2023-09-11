@@ -13,8 +13,7 @@ class Window
 {
 private:
     GLFWwindow* handle_;
-    double scroll_dx_;
-    double scroll_dy_;
+    mutable std::pair<int, int> scroll_delta_;
 
     static void on_resize_internal(GLFWwindow* window, int width, int height);
     static void on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset);
@@ -42,7 +41,7 @@ public:
     virtual void render() = 0;
 
     std::pair<int, int> size() const;
-    std::pair<double, double> scroll() const;
+    std::pair<int, int> scroll() const;
     bool should_close() const;
     bool current() const;
 

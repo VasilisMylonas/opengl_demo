@@ -4,37 +4,43 @@
 
 #include <GLFW/glfw3.h>
 
+#include <functional>
+
 namespace vcl
 {
+
+static void with_context(GLFWwindow* window, std::function<void()> function)
+{
+    GLFWwindow* previous = glfwGetCurrentContext();
+    glfwMakeContextCurrent(window);
+    function();
+    glfwMakeContextCurrent(previous);
+}
 
 static Window* get_wrapper(GLFWwindow* handle)
 {
     return static_cast<Window*>(glfwGetWindowUserPointer(handle));
 }
 
+std::pair<int, int> Window::scroll() const
+{
+    auto value = scroll_delta_;
+    scroll_delta_ = {0, 0};
+    return value;
+}
+
 void Window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
 {
     auto self = get_wrapper(window);
-
-    self->scroll_dx_ = x_offset;
-    self->scroll_dy_ = y_offset;
-}
-
-std::pair<double, double> Window::scroll() const
-{
-    return {scroll_dx_, scroll_dy_};
+    self->scroll_delta_ = {x_offset, y_offset};
 }
 
 void Window::on_resize_internal(GLFWwindow* window, int width, int height)
 {
-    auto previous = glfwGetCurrentContext();
-
-    glfwMakeContextCurrent(window);
-    glViewport(0, 0, width, height);
-    glfwMakeContextCurrent(previous);
+    with_context(window, [width, height]() { glViewport(0, 0, width, height); });
 }
 
-Window::Window(int width, int height, const char* title) : scroll_dx_{0}, scroll_dy_{0}
+Window::Window(int width, int height, const char* title) : scroll_delta_{0, 0}
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -54,9 +60,9 @@ Window::Window(int width, int height, const char* title) : scroll_dx_{0}, scroll
     glfwSetWindowUserPointer(handle_, this);
 
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
-    on_resize_internal(handle_, width, height);
-
     glfwSetScrollCallback(handle_, on_mouse_scroll_internal);
+
+    on_resize_internal(handle_, width, height);
 
     make_current();
 }
@@ -64,8 +70,7 @@ Window::Window(int width, int height, const char* title) : scroll_dx_{0}, scroll
 Window::Window(Window&& other)
 {
     handle_ = other.handle_;
-    scroll_dx_ = other.scroll_dx_;
-    scroll_dy_ = other.scroll_dy_;
+    scroll_delta_ = other.scroll_delta_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
 }
@@ -73,8 +78,7 @@ Window::Window(Window&& other)
 Window& Window::operator=(Window&& other)
 {
     handle_ = other.handle_;
-    scroll_dx_ = other.scroll_dx_;
-    scroll_dy_ = other.scroll_dy_;
+    scroll_delta_ = other.scroll_delta_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
     return *this;
@@ -113,7 +117,7 @@ bool Window::should_close() const
 
 Window& Window::close()
 {
-    glfwSetWindowShouldClose(handle_, GLFW_TRUE);
+    glfwSetWindowShouldClose(handle_, true);
     return *this;
 }
 
@@ -169,6 +173,7 @@ Window& Window::make_current()
 {
     glfwMakeContextCurrent(handle_);
 
+    // TODO: is this needed every time?
     glewExperimental = GL_TRUE;
 
     auto code = glewInit();
@@ -188,10 +193,7 @@ bool Window::current() const
 
 Window& Window::swap_interval(int interval)
 {
-    auto previous = glfwGetCurrentContext();
-    make_current();
-    glfwSwapInterval(interval);
-    glfwMakeContextCurrent(previous);
+    with_context(handle_, [interval]() { glfwSwapInterval(interval); });
     return *this;
 }
 

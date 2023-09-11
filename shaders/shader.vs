@@ -10,9 +10,11 @@ out vec4 v_color;
 out vec2 v_uv;
 flat out uint v_texture;
 
+uniform mat4 u_proj;
+
 void main()
 {
-    gl_Position = vec4(in_position, 1.0);
+    gl_Position = vec4(in_position, 1.0) * u_proj;
 
     // Pass to fragment shader
     v_color = in_color;

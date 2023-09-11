@@ -17,6 +17,9 @@
 #include "vcl/timer.hpp"
 #include "vcl/window.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 class MainWindow : public vcl::Window
 {
 private:
@@ -26,6 +29,7 @@ private:
     gl::Texture tex{0};
     gl::Program program{};
     std::optional<gl::Uniform> u_textures{};
+    std::optional<gl::Uniform> u_proj{};
 
     vcl::FpsCounter counter{};
     vcl::Timer timer{};
@@ -75,6 +79,7 @@ private:
 
         program.attach(vs).attach(fs).link().use().detach(fs).detach(vs);
         u_textures = program.uniform("u_textures");
+        u_proj = program.uniform("u_proj");
         int tmp[] = {static_cast<int>(tex.slot()), 0};
         u_textures->set(2, tmp);
     }
@@ -84,18 +89,36 @@ private:
         tex.source_path("../op.jpeg");
     }
 
+    float rotation = 0;
+    glm::vec3 translation{0, 0, 0};
+
+    // (0.0, 1.0]
+    float sensitivity = 0.5f;
+
 public:
     virtual void render() override
     {
+        auto [dx, dy] = scroll();
+        translation.x += (float)dx * sensitivity;
+        translation.y += (float)dy * sensitivity;
+
         gl::Renderer::clear();
 
-        vcl::Application::current().logger().info("%.2lffps", counter.fps());
+        glm::mat4 model{1};
+        glm::vec3 axis{0, 0, 1};
+        glm::mat4 proj = glm::rotate(model, rotation, axis);
+        glm::mat4 trans = glm::translate(model, translation);
 
-        if (timer.delta() > 1)
-        {
-            load_shaders();
-            timer.reset();
-        }
+        u_proj->set(proj * trans);
+
+        vcl::Application::current().logger().info("%.2lffps", counter.fps());
+        rotation += 0.01f;
+
+        // if (timer.delta() > 1)
+        // {
+        //     load_shaders();
+        //     timer.reset();
+        // }
 
         gl::Renderer::draw_texture(tex, vao, 6);
     }
@@ -110,5 +133,7 @@ public:
         vao.buffers(vbo, ibo);
         vbo.data(4, vertices.data());
         ibo.data(6, indices.data());
+
+        swap_interval(1);
     }
 };
