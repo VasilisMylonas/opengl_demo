@@ -65,7 +65,7 @@ std::optional<Uniform> Program::uniform(const std::string& name) const
         return {};
     }
 
-    return Uniform{handle_, static_cast<unsigned int>(location)};
+    return Uniform{handle_, location};
 }
 
 } // namespace gl

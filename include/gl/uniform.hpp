@@ -23,6 +23,8 @@ public:
     void set(const glm::vec3& vec);
     void set(const glm::vec4& vec);
 
+    void set(const glm::mat4& mat);
+
     void set(int value);
     void set(std::size_t count, const int* values);
 
@@ -30,11 +32,14 @@ public:
 
     // TODO: getters
 
+    int location() const;
+
 protected:
-    Uniform(unsigned int program, unsigned int handle);
+    Uniform(unsigned int program, int location);
 
 private:
     unsigned int program_;
+    int location_;
 };
 
 } // namespace gl
