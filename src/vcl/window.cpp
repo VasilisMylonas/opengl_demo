@@ -51,6 +51,8 @@ Window::Window(int width, int height, const char* title) : scroll_dx_{0}, scroll
         throw CreationException{msg};
     }
 
+    glfwSetWindowUserPointer(handle_, this);
+
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
     on_resize_internal(handle_, width, height);
 
