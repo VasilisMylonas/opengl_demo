@@ -69,8 +69,6 @@ public:
         current_ = nullptr;
     }
 
-    // TODO: copy and move
-
     static Application& current();
     const CommandLine& command_line() const;
     CommandLine& command_line();
@@ -79,9 +77,9 @@ public:
 
     Application(int argc, const char* argv[]);
     Application(const Application& other) = delete;
-    Application(Application&& other) = delete;
+    Application(Application&& other) = default;
     Application& operator=(const Application& other) = delete;
-    Application& operator=(Application&& other) = delete;
+    Application& operator=(Application&& other) = default;
     virtual ~Application() = default;
 };
 

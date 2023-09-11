@@ -53,9 +53,11 @@ public:
         bool is_flag_;
     };
 
-    // TODO: copy and move
-
     CommandLine(int argc, const char** argv);
+    CommandLine(CommandLine&& other) = default;
+    CommandLine(const CommandLine& other) = default;
+    CommandLine& operator=(CommandLine&& other) = default;
+    CommandLine& operator=(const CommandLine& other) = default;
 
     std::string_view program_name() const;
     const std::vector<std::string_view>& args() const;
