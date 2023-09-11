@@ -9,13 +9,15 @@
 #include "gl/shader.hpp"
 #include "gl/texture.hpp"
 #include "gl/uniform.hpp"
-#include "gl/vertex.hpp"
 #include "gl/vertex_array.hpp"
+#include "gl/vertex_layout.hpp"
 
 #include "vcl/application.hpp"
 #include "vcl/fps_counter.hpp"
 #include "vcl/timer.hpp"
 #include "vcl/window.hpp"
+
+#include "vertex.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,7 +25,7 @@
 class MainWindow : public vcl::Window
 {
 private:
-    gl::VertexBuffer vbo{4, gl::BufferUsage::dynamic_draw};
+    gl::VertexBuffer<Vertex> vbo{4, gl::BufferUsage::dynamic_draw};
     gl::IndexBuffer ibo{6, gl::BufferUsage::dynamic_draw};
     gl::VertexArray vao{};
     gl::Texture tex{0};
@@ -34,26 +36,26 @@ private:
     vcl::FpsCounter counter{};
     vcl::Timer timer{};
 
-    std::array<gl::Vertex, 4> vertices = {
-        gl::Vertex{
+    std::array<Vertex, 4> vertices = {
+        Vertex{
             .position = {0.5, 0.5, 0},
             .color = {1, 0, 0, 1},
             .uv = {1, 1},
             .texture = 0,
         },
-        gl::Vertex{
+        Vertex{
             .position = {0.5, -0.5, 0},
             .color = {0, 1, 0, 1},
             .uv = {1, 0},
             .texture = 0,
         },
-        gl::Vertex{
+        Vertex{
             .position = {-0.5, -0.5, 0},
             .color = {0, 0, 1, 1},
             .uv = {0, 0},
             .texture = 0,
         },
-        gl::Vertex{
+        Vertex{
             .position = {-0.5, 0.5, 0},
             .color = {1, 0, 1, 1},
             .uv = {0, 1},
@@ -130,7 +132,7 @@ public:
         load_shaders();
         load_textures();
 
-        vao.buffers(vbo, ibo);
+        vao.buffers(vbo, ibo, Vertex::layout());
         vbo.data(4, vertices.data());
         ibo.data(6, indices.data());
 

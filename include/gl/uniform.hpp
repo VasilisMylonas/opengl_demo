@@ -7,7 +7,7 @@
 namespace gl
 {
 
-class Uniform : public Object
+class Uniform
 {
 public:
     friend class Program;

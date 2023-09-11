@@ -43,22 +43,19 @@ void Uniform::set(std::size_t count, const int* values)
     GL_CALL(glProgramUniform1iv(program_, location_, static_cast<GLsizei>(count), values));
 }
 
-Uniform::Uniform(Uniform&& other)
-    : Object{std::move(other)}, program_{other.program_}, location_{other.location_}
+Uniform::Uniform(Uniform&& other) : program_{other.program_}, location_{other.location_}
 {
 }
 
 Uniform& Uniform::operator=(Uniform&& other)
 {
     this->~Uniform();
-    Object::operator=(std::move(other));
     program_ = other.program_;
     location_ = other.location_;
     return *this;
 }
 
-Uniform::Uniform(unsigned int program, int location)
-    : Object{0}, program_{program}, location_{location}
+Uniform::Uniform(unsigned int program, int location) : program_{program}, location_{location}
 {
 }
 
