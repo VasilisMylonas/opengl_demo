@@ -13,6 +13,7 @@ VertexArray::VertexArray(VertexArray&& other) : Object{std::move(other)}
 
 VertexArray& VertexArray::operator=(VertexArray&& other)
 {
+    this->~VertexArray();
     Object::operator=(std::move(other));
     return *this;
 }

@@ -102,6 +102,7 @@ Logger::Logger(Logger&& other)
 
 Logger& Logger::operator=(Logger&& other)
 {
+    this->~Logger();
     source_ = std::move(other.source_);
     stream_ = other.stream_;
     level_ = other.level_;

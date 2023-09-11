@@ -48,6 +48,7 @@ public:
 
     Buffer& operator=(Buffer&& other)
     {
+        this->~Buffer();
         Object::operator=(std::move(other));
         return *this;
     }

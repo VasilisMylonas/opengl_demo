@@ -50,6 +50,7 @@ Uniform::Uniform(Uniform&& other)
 
 Uniform& Uniform::operator=(Uniform&& other)
 {
+    this->~Uniform();
     Object::operator=(std::move(other));
     program_ = other.program_;
     location_ = other.location_;

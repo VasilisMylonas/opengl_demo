@@ -8,6 +8,23 @@
 namespace vcl
 {
 
+void Application::init()
+{
+    if (!glfwInit())
+    {
+        const char* msg;
+        glfwGetError(&msg);
+        throw CreationException(msg);
+    }
+
+    glfwSetErrorCallback(on_glfw_error);
+}
+
+void Application::fini()
+{
+    glfwTerminate();
+}
+
 const Logger& Application::logger() const
 {
     return logger_;
@@ -26,20 +43,6 @@ CommandLine& Application::command_line()
 Application::Application(int argc, const char* argv[])
     : logger_{std::clog, "Application"}, command_line_{argc, argv}
 {
-    if (!glfwInit())
-    {
-        const char* msg;
-        glfwGetError(&msg);
-        throw CreationException(msg);
-    }
-
-    glfwSetErrorCallback(on_glfw_error);
-}
-
-Application::~Application()
-{
-    glfwTerminate();
-    current_ = nullptr;
 }
 
 void Application::on_glfw_error(int error, const char* description)

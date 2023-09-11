@@ -19,6 +19,7 @@ Program::Program(Program&& other) : Object{std::move(other)}
 
 Program& Program::operator=(Program&& other)
 {
+    this->~Program();
     Object::operator=(std::move(other));
     return *this;
 }

@@ -53,6 +53,8 @@ public:
         bool is_flag_;
     };
 
+    // TODO: copy and move
+
     CommandLine(int argc, const char** argv);
 
     std::string_view program_name() const;

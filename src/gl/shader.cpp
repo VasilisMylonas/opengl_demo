@@ -21,6 +21,7 @@ Shader::Shader(Shader&& other) : Object{std::move(other)}
 
 Shader& Shader::operator=(Shader&& other)
 {
+    this->~Shader();
     Object::operator=(std::move(other));
     return *this;
 }

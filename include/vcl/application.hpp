@@ -21,6 +21,8 @@ private:
 
 protected:
     virtual void main_loop(Window& window);
+    virtual void init();
+    virtual void fini();
 
 public:
     class CreationException : public std::runtime_error
@@ -49,23 +51,38 @@ public:
         }
 
         current_ = this;
-        std::unique_ptr<Window> window = std::make_unique<T>();
-        window->make_current();
-        main_loop(*window);
+        init();
+
+        try
+        {
+            std::unique_ptr<Window> window = std::make_unique<T>();
+            main_loop(*window);
+        }
+        catch (const std::exception& e)
+        {
+            fini();
+            current_ = nullptr;
+            throw;
+        }
+
+        fini();
         current_ = nullptr;
     }
+
+    // TODO: copy and move
 
     static Application& current();
     const CommandLine& command_line() const;
     CommandLine& command_line();
+    const Logger& logger() const;
     void poll_events() const;
+
     Application(int argc, const char* argv[]);
     Application(const Application& other) = delete;
-    Application(Application&& other) = default;
+    Application(Application&& other) = delete;
     Application& operator=(const Application& other) = delete;
-    Application& operator=(Application&& other) = default;
-    virtual ~Application();
-    const Logger& logger() const;
+    Application& operator=(Application&& other) = delete;
+    virtual ~Application() = default;
 };
 
 } // namespace vcl

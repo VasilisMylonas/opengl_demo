@@ -77,6 +77,7 @@ Window::Window(Window&& other)
 
 Window& Window::operator=(Window&& other)
 {
+    this->~Window();
     handle_ = other.handle_;
     scroll_delta_ = other.scroll_delta_;
     glfwSetWindowUserPointer(handle_, this);
