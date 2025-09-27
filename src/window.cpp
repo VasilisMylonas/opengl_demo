@@ -4,9 +4,11 @@
 #include <GL/glew.h> // Must come before GLFW
 #include <GLFW/glfw3.h>
 
+#if IMGUI_INTEGRATION
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#endif
 
 static Window* get_wrapper(GLFWwindow* handle)
 {
@@ -33,15 +35,19 @@ void Window::with_context(std::function<void()> function)
 
 void Window::begin_frame()
 {
+#if IMGUI_INTEGRATION
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+#endif
 }
 
 void Window::end_frame()
 {
+#if IMGUI_INTEGRATION
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 }
 
 void Window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
@@ -59,7 +65,10 @@ void Window::on_resize_internal(GLFWwindow* window, int width, int height)
 void Window::make_current()
 {
     glfwMakeContextCurrent(handle_);
+
+#if IMGUI_INTEGRATION
     ImGui::SetCurrentContext(context_);
+#endif
 
     // TODO: is this needed every time?
     glewExperimental = GL_TRUE;
@@ -99,6 +108,7 @@ Window::Window(
     glfwSetFramebufferSizeCallback(handle_, on_resize_internal);
     glfwSetScrollCallback(handle_, on_mouse_scroll_internal);
 
+#if IMGUI_INTEGRATION
     // Create ImGui context
     context_ = ImGui::CreateContext();
 
@@ -108,6 +118,7 @@ Window::Window(
             ImGui_ImplOpenGL3_Init();
             ImGui_ImplGlfw_InitForOpenGL(handle_, true);
         });
+#endif
 
     // Set size
     on_resize_internal(handle_, width, height);
@@ -120,6 +131,7 @@ Window::~Window()
         return;
     }
 
+#if IMGUI_INTEGRATION
     with_context(
         []()
         {
@@ -128,6 +140,7 @@ Window::~Window()
         });
 
     ImGui::DestroyContext(context_);
+#endif
     glfwDestroyWindow(handle_);
     handle_ = nullptr;
 }
@@ -135,22 +148,30 @@ Window::~Window()
 Window::Window(Window&& other)
 {
     handle_ = other.handle_;
+#if IMGUI_INTEGRATION
     context_ = other.context_;
+#endif
     scroll_delta_ = other.scroll_delta_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
+#if IMGUI_INTEGRATION
     other.context_ = nullptr;
+#endif
 }
 
 Window& Window::operator=(Window&& other)
 {
     this->~Window();
     handle_ = other.handle_;
+#if IMGUI_INTEGRATION
     context_ = other.context_;
+#endif
     scroll_delta_ = other.scroll_delta_;
     glfwSetWindowUserPointer(handle_, this);
     other.handle_ = nullptr;
+#if IMGUI_INTEGRATION
     other.context_ = nullptr;
+#endif
     return *this;
 }
 
