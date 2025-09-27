@@ -1,13 +1,10 @@
-#include "vcl/window.hpp"
+#include "window.hpp"
 
-#include "gl/renderer.hpp"
-
+#include <GL//glew.h> // Must come before GLFW
 #include <GLFW/glfw3.h>
 
 #include <functional>
-
-namespace vcl
-{
+#include <stdexcept>
 
 static void with_context(GLFWwindow* window, std::function<void()> function)
 {
@@ -22,13 +19,6 @@ static Window* get_wrapper(GLFWwindow* handle)
     return static_cast<Window*>(glfwGetWindowUserPointer(handle));
 }
 
-std::pair<int, int> Window::scroll() const
-{
-    auto value = scroll_delta_;
-    scroll_delta_ = {0, 0};
-    return value;
-}
-
 void Window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
 {
     auto self = get_wrapper(window);
@@ -40,11 +30,26 @@ void Window::on_resize_internal(GLFWwindow* window, int width, int height)
     with_context(window, [width, height]() { glViewport(0, 0, width, height); });
 }
 
-Window::Window(int width, int height, const char* title) : scroll_delta_{0, 0}
+void Window::make_current()
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwMakeContextCurrent(handle_);
+
+    // TODO: is this needed every time?
+    glewExperimental = GL_TRUE;
+
+    auto code = glewInit();
+    if (code != GLEW_OK)
+    {
+        throw std::runtime_error(reinterpret_cast<const char*>(glewGetErrorString(code)));
+    }
+}
+
+Window::Window(int width, int height, const char* title, int opengl_major_version, int opengl_minor_version) : scroll_delta_{0, 0}
+{
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, opengl_major_version);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, opengl_minor_version);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
     // TODO: anti-aliasing
     glfwWindowHint(GLFW_SAMPLES, 16);
@@ -54,7 +59,7 @@ Window::Window(int width, int height, const char* title) : scroll_delta_{0, 0}
     {
         const char* msg;
         glfwGetError(&msg);
-        throw CreationException{msg};
+        throw std::runtime_error(msg);
     }
 
     glfwSetWindowUserPointer(handle_, this);
@@ -63,8 +68,14 @@ Window::Window(int width, int height, const char* title) : scroll_delta_{0, 0}
     glfwSetScrollCallback(handle_, on_mouse_scroll_internal);
 
     on_resize_internal(handle_, width, height);
+}
 
-    make_current();
+Window::~Window()
+{
+    if (handle_)
+    {
+        glfwDestroyWindow(handle_);
+    }
 }
 
 Window::Window(Window&& other)
@@ -85,14 +96,6 @@ Window& Window::operator=(Window&& other)
     return *this;
 }
 
-Window::~Window()
-{
-    if (handle_)
-    {
-        glfwDestroyWindow(handle_);
-    }
-}
-
 GLFWwindow* Window::handle() const
 {
     return handle_;
@@ -105,10 +108,9 @@ std::pair<int, int> Window::size() const
     return {width, height};
 }
 
-Window& Window::resize(int width, int height)
+bool Window::current() const
 {
-    glfwSetWindowSize(handle_, width, height);
-    return *this;
+    return glfwGetCurrentContext() == handle_;
 }
 
 bool Window::should_close() const
@@ -116,86 +118,64 @@ bool Window::should_close() const
     return glfwWindowShouldClose(handle_);
 }
 
-Window& Window::close()
+std::pair<int, int> Window::scroll_delta() const
 {
-    glfwSetWindowShouldClose(handle_, true);
-    return *this;
+    auto value = scroll_delta_;
+    scroll_delta_ = {0, 0};
+    return value;
 }
 
-Window& Window::swap_buffers()
-{
-    glfwSwapBuffers(handle_);
-    return *this;
-}
-
-Window& Window::show()
-{
-    glfwShowWindow(handle_);
-    return *this;
-}
-
-Window& Window::hide()
-{
-    glfwHideWindow(handle_);
-    return *this;
-}
-
-Window& Window::attention()
-{
-    glfwRequestWindowAttention(handle_);
-    return *this;
-}
-
-Window& Window::restore()
-{
-    glfwRestoreWindow(handle_);
-    return *this;
-}
-
-Window& Window::minimize()
-{
-    glfwIconifyWindow(handle_);
-    return *this;
-}
-
-Window& Window::maximize()
-{
-    glfwMaximizeWindow(handle_);
-    return *this;
-}
-
-Window& Window::focus()
-{
-    glfwFocusWindow(handle_);
-    return *this;
-}
-
-Window& Window::make_current()
-{
-    glfwMakeContextCurrent(handle_);
-
-    // TODO: is this needed every time?
-    glewExperimental = GL_TRUE;
-
-    auto code = glewInit();
-    if (code != GLEW_OK)
-    {
-        auto msg = reinterpret_cast<const char*>(glewGetErrorString(code));
-        throw ContextException{msg};
-    }
-
-    return *this;
-}
-
-bool Window::current() const
-{
-    return glfwGetCurrentContext() == handle_;
-}
-
-Window& Window::swap_interval(int interval)
+void Window::swap_interval(int interval)
 {
     with_context(handle_, [interval]() { glfwSwapInterval(interval); });
-    return *this;
 }
 
-} // namespace vcl
+void Window::swap_buffers()
+{
+    glfwSwapBuffers(handle_);
+}
+
+void Window::resize(int width, int height)
+{
+    glfwSetWindowSize(handle_, width, height);
+}
+
+void Window::close()
+{
+    glfwSetWindowShouldClose(handle_, true);
+}
+
+void Window::show()
+{
+    glfwShowWindow(handle_);
+}
+
+void Window::hide()
+{
+    glfwHideWindow(handle_);
+}
+
+void Window::attention()
+{
+    glfwRequestWindowAttention(handle_);
+}
+
+void Window::restore()
+{
+    glfwRestoreWindow(handle_);
+}
+
+void Window::minimize()
+{
+    glfwIconifyWindow(handle_);
+}
+
+void Window::maximize()
+{
+    glfwMaximizeWindow(handle_);
+}
+
+void Window::focus()
+{
+    glfwFocusWindow(handle_);
+}
