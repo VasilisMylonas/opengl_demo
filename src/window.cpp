@@ -1,6 +1,6 @@
 #include "window.hpp"
 
-#include <GL//glew.h> // Must come before GLFW
+#include <GL/glew.h> // Must come before GLFW
 #include <GLFW/glfw3.h>
 
 #include <functional>
@@ -44,7 +44,9 @@ void Window::make_current()
     }
 }
 
-Window::Window(int width, int height, const char* title, int opengl_major_version, int opengl_minor_version) : scroll_delta_{0, 0}
+Window::Window(
+    int width, int height, const char* title, int opengl_major_version, int opengl_minor_version)
+    : scroll_delta_{0, 0}
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, opengl_major_version);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, opengl_minor_version);

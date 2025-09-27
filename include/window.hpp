@@ -9,17 +9,9 @@ typedef struct GLFWwindow GLFWwindow;
 
 class Window
 {
-private:
-    GLFWwindow* handle_;
-    mutable std::pair<int, int> scroll_delta_;
-
-    static void on_resize_internal(GLFWwindow* window, int width, int height);
-    static void on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset);
-
-protected:
+public:
     GLFWwindow* handle() const;
 
-public:
     std::pair<int, int> size() const;
     std::pair<int, int> scroll_delta() const;
     bool should_close() const;
@@ -39,10 +31,21 @@ public:
     void make_current();
     void swap_interval(int interval);
 
-    Window(int width, int height, const char* title, int opengl_major_version = 3, int opengl_minor_version = 3);
+    Window(int width,
+           int height,
+           const char* title,
+           int opengl_major_version = 3,
+           int opengl_minor_version = 3);
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
     Window(Window&& other);
     Window& operator=(Window&& other);
     virtual ~Window();
+
+private:
+    GLFWwindow* handle_;
+    mutable std::pair<int, int> scroll_delta_;
+
+    static void on_resize_internal(GLFWwindow* window, int width, int height);
+    static void on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset);
 };
