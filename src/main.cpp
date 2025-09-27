@@ -24,19 +24,21 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    Window window(1200, 800, "OpenGL Demo", 4, 0);
-    window.show();
+    {
+        Window window(1200, 800, "OpenGL Demo", 4, 0);
+        window.show();
 
-    window.make_current();
-    window.swap_interval(1); // Enable vsync
+        window.make_current();
+        window.swap_interval(1); // Enable vsync
 
-    while (!window.should_close()) {
-        glfwPollEvents();
+        while (!window.should_close()) {
+            glfwPollEvents();
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        window.swap_buffers();
+            window.swap_buffers();
+        }
     }
 
     glfwTerminate();
