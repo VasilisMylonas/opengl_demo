@@ -2,20 +2,23 @@
 
 #pragma once
 
+#include <functional>
 #include <utility>
 
 // From GLFW
 typedef struct GLFWwindow GLFWwindow;
+typedef struct ImGuiContext ImGuiContext;
 
 class Window
 {
 public:
     GLFWwindow* handle() const;
+    ImGuiContext* context() const;
 
     std::pair<int, int> size() const;
     std::pair<int, int> scroll_delta() const;
     bool should_close() const;
-    bool current() const;
+    bool is_current() const;
 
     void resize(int width, int height);
     void close();
@@ -27,9 +30,13 @@ public:
     void show();
     void hide();
 
-    void swap_buffers();
     void make_current();
+    void begin_frame();
+    void end_frame();
+    void swap_buffers();
     void swap_interval(int interval);
+
+    void with_context(std::function<void()> function);
 
     Window(int width,
            int height,
@@ -44,6 +51,7 @@ public:
 
 private:
     GLFWwindow* handle_;
+    ImGuiContext* context_;
     mutable std::pair<int, int> scroll_delta_;
 
     static void on_resize_internal(GLFWwindow* window, int width, int height);
