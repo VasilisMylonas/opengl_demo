@@ -3,15 +3,13 @@
 #include <cstdio>
 #include <sys/stat.h>
 
-// TODO
 std::string read_file(const std::string& path)
 {
     FILE* f = fopen(path.c_str(), "rb");
 
     if (!f)
     {
-        // TODO
-        fputs("Shader not found!\n", stderr);
+        fputs("File not found!\n", stderr);
         std::exit(EXIT_FAILURE);
     }
 

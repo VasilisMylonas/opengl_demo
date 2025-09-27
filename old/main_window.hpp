@@ -74,8 +74,8 @@ private:
 
     void load_shaders()
     {
-        gl::Shader fs{gl::Shader::Type::fragment};
-        gl::Shader vs{gl::Shader::Type::vertex};
+        gl::Shader fs{gl::Shader::ShaderType::fragment};
+        gl::Shader vs{gl::Shader::ShaderType::vertex};
         fs.source_path("../shaders/shader.fs").compile();
         vs.source_path("../shaders/shader.vs").compile();
 

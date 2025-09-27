@@ -9,10 +9,14 @@ file(GLOB IMGUI_SOURCES
 )
 add_executable(opengl_demo ${SOURCES} ${IMGUI_SOURCES})
 
+add_subdirectory(third_party/glm)
+target_link_libraries(opengl_demo PRIVATE glm)
+
 target_include_directories(opengl_demo PUBLIC
     include
     third_party/imgui
     third_party/imgui/backends
+    third_party/glm
 )
 target_link_libraries(opengl_demo PUBLIC glfw GL GLEW)
 target_compile_features(opengl_demo PUBLIC cxx_std_20)

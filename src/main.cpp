@@ -1,3 +1,4 @@
+#include "util.hpp"
 #include "window.hpp"
 
 #include <cstdio>
@@ -5,9 +6,12 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/ext/vector_float3.hpp>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+
+#include "gl/buffer.hpp"
+#include "gl/program.hpp"
+#include "gl/shader.hpp"
 
 void glfw_error([[maybe_unused]] int error, const char* description)
 {
@@ -23,6 +27,8 @@ void set_font(const char* font_path, float font_size)
         fprintf(stderr, "Failed to load font from %s!\n", font_path);
     }
 }
+
+#include "gl/buffer.hpp"
 
 int main()
 {
@@ -45,6 +51,46 @@ int main()
         window.show();
 
         bool close = false;
+
+        glm::vec3 vertices[] = {
+            {
+                -0.5f,
+                -0.5f,
+                0.0f,
+            },
+            {
+                0.5f,
+                -0.5f,
+                0.0f,
+            },
+            {
+                0.0f,
+                0.5f,
+                0.0f,
+            },
+        };
+
+        gl::Shader vs(gl::ShaderType::vertex);
+        vs.set_source(read_file("./shaders/shader.vs"));
+        vs.compile();
+
+        gl::Shader fs(gl::ShaderType::fragment);
+        fs.set_source(read_file("./shaders/shader.fs"));
+        fs.compile();
+
+        gl::Program program;
+        program.attach(vs);
+        program.attach(fs);
+        program.link();
+        program.use();
+
+        gl::ArrayBuffer<glm::vec3> vbo(3, gl::BufferUsage::static_draw);
+        gl::IndexBuffer<int> ibo(3, gl::BufferUsage::static_draw);
+
+        ibo.data(3, (int[]){0, 1, 2});
+        vbo.data(3, vertices);
+
+        Vertex
 
         while (!window.should_close() && !close)
         {

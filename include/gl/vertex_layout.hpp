@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gl/object.hpp"
+#include "gl/errors.hpp"
 
 #include <glm/glm.hpp>
 #include <vector>
