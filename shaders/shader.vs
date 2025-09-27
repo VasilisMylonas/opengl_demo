@@ -14,6 +14,7 @@ uniform mat4 u_proj;
 
 void main()
 {
+
     gl_Position = vec4(in_position, 1.0) * u_proj;
 
     // Pass to fragment shader
