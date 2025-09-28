@@ -1,14 +1,23 @@
-#version 400
+#version 400 core
 
 layout(location = 0) out vec4 out_color;
 
-uniform sampler2D u_textures[2];
-
 in vec4 v_color;
-in vec2 v_uv;
-flat in uint v_texture;
+in vec2 v_texture_coords;
 
-void main() 
-{ 
-    out_color = v_color * texture(u_textures[v_texture], v_uv);
+uniform mat4 u_mvp;
+uniform vec3 u_color;
+uniform sampler2D u_texture;
+uniform bool u_use_texture;
+
+void main()
+{
+    if (!u_use_texture)
+    {
+        out_color = vec4(u_color, 1.0);
+    }
+    else
+    {
+        out_color = texture(u_texture, v_texture_coords) * vec4(u_color, 1.0);
+    }
 }

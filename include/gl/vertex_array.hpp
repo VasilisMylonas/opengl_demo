@@ -2,27 +2,47 @@
 
 #include "gl/buffer.hpp"
 #include "gl/vertex_layout.hpp"
+#include <GL/gl.h>
 
 namespace gl
 {
-template <typename VertexType>
-using VertexBuffer = gl::Buffer<VertexType, gl::BufferTarget::array>;
-using IndexBuffer = gl::Buffer<unsigned int, gl::BufferTarget::index>;
-
-class VertexArray : public Object
+class vertex_array
 {
 public:
-    friend class Renderer;
+    vertex_array()
+    {
+        GL_CALL(glGenVertexArrays(1, &handle_));
+    }
 
-    VertexArray();
-    ~VertexArray();
+    ~vertex_array()
+    {
+        GL_CALL(glDeleteVertexArrays(1, &handle_));
+    }
 
-    VertexArray(VertexArray&& other);
-    VertexArray& operator=(VertexArray&& other);
+    vertex_array(vertex_array&& other)
+    {
+        handle_ = other.handle_;
+        other.handle_ = 0;
+    }
 
-    template <typename VertexType>
-    VertexArray&
-    buffers(const VertexBuffer<VertexType>& vbo, const IndexBuffer& ibo, const VertexLayout& layout)
+    vertex_array& operator=(vertex_array&& other)
+    {
+        if (this != &other)
+        {
+            GL_CALL(glDeleteVertexArrays(1, &handle_));
+            handle_ = other.handle_;
+            other.handle_ = 0;
+        }
+        return *this;
+    }
+
+    vertex_array(const vertex_array&) = delete;
+    vertex_array& operator=(const vertex_array&) = delete;
+
+    template <typename VertexType, typename IndexType>
+    void buffers(const vertex_buffer<VertexType>& vbo,
+                 const index_buffer<IndexType>& ibo,
+                 const vertex_layout& layout)
     {
         bind();
         vbo.bind();
@@ -42,12 +62,36 @@ public:
         unbind();
         vbo.unbind();
         ibo.unbind();
-        return *this;
+
+        ibo_size = ibo.size();
     }
 
-protected:
-    void bind() const;
-    void unbind() const;
+    void draw(std::size_t count)
+    {
+        bind();
+        // TODO: GL_UNSIGNED_INT, does it matter or is it just for indices?
+        GL_CALL(glDrawElements(GL_TRIANGLES, static_cast<int>(count), GL_UNSIGNED_INT, nullptr));
+        unbind();
+    }
+
+    void draw()
+    {
+        draw(ibo_size);
+    }
+
+private:
+    void bind() const
+    {
+        GL_CALL(glBindVertexArray(handle_));
+    }
+
+    void unbind() const
+    {
+        GL_CALL(glBindVertexArray(0));
+    }
+
+    unsigned int handle_ = 0;
+    std::size_t ibo_size = 0;
 };
 
 } // namespace gl

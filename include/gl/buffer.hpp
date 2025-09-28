@@ -1,10 +1,12 @@
 #pragma once
 
-#include "gl/object.hpp"
+#include "gl/errors.hpp"
+#include <GL/gl.h>
+#include <GL/glew.h>
 
 namespace gl
 {
-enum class BufferUsage
+enum class buffer_usage
 {
     static_draw = GL_STATIC_DRAW,
     dynamic_draw = GL_DYNAMIC_DRAW,
@@ -17,63 +19,65 @@ enum class BufferUsage
     stream_copy = GL_STREAM_COPY,
 };
 
-enum class BufferTarget
+enum class buffer_target
 {
     index = GL_ELEMENT_ARRAY_BUFFER,
-    array = GL_ARRAY_BUFFER,
+    vertex = GL_ARRAY_BUFFER,
     texture = GL_TEXTURE_BUFFER,
 };
 
-enum class BufferAccess
+enum class buffer_access
 {
     read_only = GL_READ_ONLY,
     write_only = GL_WRITE_ONLY,
     read_write = GL_READ_WRITE,
 };
 
-template <typename T, BufferTarget U>
-class Buffer : public Object
+template <typename Type, buffer_target Target>
+class basic_buffer
 {
 public:
-    friend class VertexArray;
+    friend class vertex_array;
 
-    template <typename TOther, BufferTarget UOther>
-    explicit Buffer(Buffer<TOther, UOther>&& other) : Object{std::move(other)}
+    basic_buffer(basic_buffer&& other)
     {
+        handle_ = other.handle_;
+        other.handle_ = 0;
     }
 
-    Buffer(Buffer&& other) : Object{std::move(other)}
+    basic_buffer& operator=(basic_buffer&& other)
     {
-    }
+        if (this == &other)
+        {
+            return *this;
+        }
 
-    Buffer& operator=(Buffer&& other)
-    {
-        this->~Buffer();
-        Object::operator=(std::move(other));
+        this->~basic_buffer();
+        handle_ = other.handle_;
+        other.handle_ = 0;
         return *this;
     }
 
-    Buffer(std::size_t count, BufferUsage usage) : Object{0}
+    basic_buffer(const basic_buffer&) = delete;
+    basic_buffer& operator=(const basic_buffer&) = delete;
+
+    basic_buffer()
     {
         GL_CALL(glGenBuffers(1, &handle_));
-
-        bind();
-        GL_CALL(glBufferData(static_cast<GLenum>(U),
-                             static_cast<GLsizeiptr>(count) * sizeof(T),
-                             nullptr,
-                             static_cast<GLenum>(usage)));
-        unbind();
     }
 
-    ~Buffer()
+    ~basic_buffer()
     {
-        GL_CALL(glDeleteBuffers(1, &handle_));
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteBuffers(1, &handle_));
+        }
     }
 
-    T* map(BufferAccess access)
+    Type* map(buffer_access access)
     {
         bind();
-        GL_CALL(T* ret = glMapBuffer(static_cast<GLenum>(U), static_cast<GLenum>(access)));
+        GL_CALL(Type* ret = glMapBuffer(static_cast<GLenum>(Target), static_cast<GLenum>(access)));
         unbind();
         return ret;
     }
@@ -81,28 +85,60 @@ public:
     bool unmap()
     {
         bind();
-        GL_CALL(bool ret = glUnmapBuffer(static_cast<GLenum>(U)));
+        GL_CALL(bool ret = glUnmapBuffer(static_cast<GLenum>(Target)));
         unbind();
         return ret;
     }
 
-    void data(std::size_t count, const T* data, std::size_t dest_index = 0)
+    void data(std::size_t count, const Type* data, buffer_usage usage)
     {
         bind();
-        GL_CALL(glBufferSubData(
-            static_cast<GLenum>(U), dest_index * sizeof(T), count * sizeof(T), data));
+        GL_CALL(glBufferData(static_cast<GLenum>(Target),
+                             static_cast<GLsizeiptr>(count) * sizeof(Type),
+                             data,
+                             static_cast<GLenum>(usage)));
         unbind();
     }
 
-protected:
+    std::size_t size() const
+    {
+        bind();
+        GL_CALL(GLint size = 0);
+        GL_CALL(glGetBufferParameteriv(static_cast<GLenum>(Target), GL_BUFFER_SIZE, &size));
+        unbind();
+        return size / sizeof(Type);
+    }
+
+    // TODO
+    // void update(std::size_t count, const Type* data, std::size_t dest_index = 0)
+    // {
+    //     bind();
+    //     GL_CALL(glBufferSubData(
+    //         static_cast<GLenum>(Target), dest_index * sizeof(Type), count * sizeof(Type), data));
+    //     unbind();
+    // }
+
+private:
     void bind() const
     {
-        GL_CALL(glBindBuffer(static_cast<GLenum>(U), handle_));
+        GL_CALL(glBindBuffer(static_cast<GLenum>(Target), handle_));
     }
 
     void unbind() const
     {
-        GL_CALL(glBindBuffer(static_cast<GLenum>(U), 0));
+        GL_CALL(glBindBuffer(static_cast<GLenum>(Target), 0));
     }
+
+    GLuint handle_ = 0;
 };
+
+template <typename T>
+using vertex_buffer = basic_buffer<T, buffer_target::vertex>;
+
+template <typename T>
+using texture_buffer = basic_buffer<T, buffer_target::texture>;
+
+template <typename T>
+using index_buffer = basic_buffer<T, buffer_target::index>;
+
 } // namespace gl

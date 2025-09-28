@@ -1,23 +1,21 @@
-#version 400
+#version 400 core
 
 layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in vec4 in_color;
-layout(location = 3) in vec2 in_uv;
-layout(location = 4) in uint in_texture;
+layout(location = 1) in vec4 in_color;
+layout(location = 2) in vec2 in_texture_coords;
 
 out vec4 v_color;
-out vec2 v_uv;
-flat out uint v_texture;
+out vec2 v_texture_coords;
 
-uniform mat4 u_proj;
+uniform mat4 u_mvp;
+uniform vec3 u_color;
+uniform sampler2D u_texture;
+uniform bool u_use_texture;
 
 void main()
 {
-    gl_Position = vec4(in_position, 1.0) * u_proj;
+    gl_Position = u_mvp * vec4(in_position, 1.0);
 
-    // Pass to fragment shader
+    v_texture_coords = in_texture_coords;
     v_color = in_color;
-    v_uv = in_uv;
-    v_texture = in_texture;
 }

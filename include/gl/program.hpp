@@ -2,28 +2,106 @@
 
 #include "gl/shader.hpp"
 #include "gl/uniform.hpp"
-
 #include <optional>
 #include <string>
 
 namespace gl
 {
-class Program : public Object
+
+class program
 {
 public:
-    Program();
-    ~Program();
-    Program(Program&& other);
-    Program& operator=(Program&& other);
+    program()
+    {
+        GL_CALL(handle_ = glCreateProgram());
+    }
 
-    std::optional<Uniform> uniform(const std::string& name) const;
+    ~program()
+    {
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteProgram(handle_));
+        }
+    }
 
-    bool valid() const;
+    program(const program&) = delete;
+    program& operator=(const program&) = delete;
 
-    Program& attach(const Shader& shader);
-    Program& detach(const Shader& shader);
-    Program& link();
-    Program& use();
+    program(program&& other)
+    {
+        handle_ = other.handle_;
+        other.handle_ = 0;
+    }
+
+    program& operator=(program&& other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        this->~program();
+        handle_ = other.handle_;
+        other.handle_ = 0;
+        return *this;
+    }
+
+    std::optional<gl::uniform> uniform(const std::string& name) const
+    {
+        int location = -1;
+        GL_CALL(location = glGetUniformLocation(handle_, name.c_str()));
+        if (location == -1)
+        {
+            return std::nullopt;
+        }
+        return gl::uniform(handle_, location);
+    }
+
+    bool valid() const
+    {
+        GL_CALL(glValidateProgram(handle_));
+        int status = 0;
+        GL_CALL(glGetProgramiv(handle_, GL_VALIDATE_STATUS, &status));
+        return status == GL_TRUE;
+    }
+
+    void attach(const shader& shader)
+    {
+        GL_CALL(glAttachShader(handle_, shader.handle_));
+    }
+
+    void detach(const shader& shader)
+    {
+        GL_CALL(glDetachShader(handle_, shader.handle_));
+    }
+
+    void link()
+    {
+        GL_CALL(glLinkProgram(handle_));
+    }
+
+    std::string info_log() const
+    {
+        std::string log;
+
+        int length = 0;
+        GL_CALL(glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &length));
+
+        if (length > 0)
+        {
+            log.resize(length);
+            GL_CALL(glGetProgramInfoLog(handle_, length, &length, log.data()));
+        }
+
+        return log;
+    }
+
+    void use() const
+    {
+        GL_CALL(glUseProgram(handle_));
+    }
+
+private:
+    int handle_ = 0;
 };
-
 } // namespace gl

@@ -1,41 +1,91 @@
 #pragma once
 
-#include "gl/object.hpp"
-
+#include "gl/errors.hpp"
 #include <glm/glm.hpp>
 
 namespace gl
 {
 
-class Uniform
+class uniform
 {
 public:
-    friend class Program;
+    friend class program;
 
-    Uniform(Uniform&& other);
-    Uniform& operator=(Uniform&& other);
+    uniform(const uniform&) = delete;
+    uniform& operator=(const uniform&) = delete;
 
-    Uniform(const Uniform&) = delete;
-    Uniform& operator=(const Uniform&) = delete;
+    uniform(uniform&& other) noexcept : program_{other.program_}, location_{other.location_}
+    {
+        other.program_ = 0;
+        other.location_ = -1;
+    }
 
-    void set(const glm::vec1& vec);
-    void set(const glm::vec2& vec);
-    void set(const glm::vec3& vec);
-    void set(const glm::vec4& vec);
+    uniform& operator=(uniform&& other) noexcept
+    {
+        if (this != &other)
+        {
+            program_ = other.program_;
+            location_ = other.location_;
+            other.program_ = 0;
+            other.location_ = -1;
+        }
+        return *this;
+    }
 
-    void set(const glm::mat4& mat);
+    void set(const glm::vec1& vec)
+    {
+        GL_CALL(glProgramUniform1f(program_, location_, vec.x));
+    }
 
-    void set(int value);
-    void set(std::size_t count, const int* values);
+    void set(const glm::vec2& vec)
+    {
+        GL_CALL(glProgramUniform2f(program_, location_, vec.x, vec.y));
+    }
 
-    // TODO: more types
+    void set(const glm::vec3& vec)
+    {
+        GL_CALL(glProgramUniform3f(program_, location_, vec.x, vec.y, vec.z));
+    }
 
-    // TODO: getters
+    void set(const glm::vec4& vec)
+    {
+        GL_CALL(glProgramUniform4f(program_, location_, vec.x, vec.y, vec.z, vec.w));
+    }
 
-    int location() const;
+    void set(const glm::mat2& mat)
+    {
+        GL_CALL(glProgramUniformMatrix2fv(program_, location_, 1, false, &mat[0][0]));
+    }
+
+    void set(const glm::mat3& mat)
+    {
+        GL_CALL(glProgramUniformMatrix3fv(program_, location_, 1, false, &mat[0][0]));
+    }
+
+    void set(const glm::mat4& mat)
+    {
+        GL_CALL(glProgramUniformMatrix4fv(program_, location_, 1, false, &mat[0][0]));
+    }
+
+    void set(int value)
+    {
+        GL_CALL(glProgramUniform1i(program_, location_, value));
+    }
+
+    void set(std::size_t count, const int* values)
+    {
+        GL_CALL(glProgramUniform1iv(program_, location_, static_cast<GLsizei>(count), values));
+    }
+
+    int location() const
+    {
+        return location_;
+    }
 
 protected:
-    Uniform(unsigned int program, int location);
+    uniform(unsigned int program, int location) : program_{program}, location_{location}
+    {
+    }
 
 private:
     unsigned int program_;

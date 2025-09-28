@@ -1,10 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
-project(notagame CXX)
+project(opengl_demo CXX)
 
-file(GLOB SRC src/*.cpp src/gl/*.cpp src/vcl/*.cpp)
+file(GLOB SOURCES src/*.cpp)
+file(GLOB IMGUI_SOURCES
+    third_party/imgui/*.cpp
+    third_party/imgui/backends/imgui_impl_glfw.cpp
+    third_party/imgui/backends/imgui_impl_opengl3.cpp
+)
+add_executable(opengl_demo ${SOURCES} ${IMGUI_SOURCES})
 
-add_executable(notagame ${SRC})
-target_include_directories(notagame PUBLIC include)
-target_link_libraries(notagame PUBLIC glfw GL GLEW)
-target_compile_features(notagame PUBLIC cxx_std_20)
-target_compile_options(notagame PUBLIC -Wall -Wextra -Wconversion -Werror -Wpedantic)
+add_subdirectory(third_party/glm)
+target_link_libraries(opengl_demo PRIVATE glm)
+
+target_include_directories(opengl_demo PUBLIC
+    include
+    third_party/imgui
+    third_party/imgui/backends
+    third_party/glm
+)
+target_link_libraries(opengl_demo PUBLIC glfw GL GLEW)
+target_compile_features(opengl_demo PUBLIC cxx_std_20)
+target_compile_options(opengl_demo PUBLIC -Wall -Wextra -Wconversion)
