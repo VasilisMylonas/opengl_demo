@@ -10,7 +10,6 @@
 
 #include "gl/buffer.hpp"
 #include "gl/program.hpp"
-#include "gl/renderer.hpp"
 #include "gl/shader.hpp"
 #include "gl/vertex_array.hpp"
 #include "gl/vertex_layout.hpp"
@@ -99,9 +98,10 @@ public:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        vao.bind();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        vao.unbind();
+        vao.draw(3);
+        // vao.bind();
+        // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        // vao.unbind();
 
         if (ImGui::BeginMainMenuBar())
         {

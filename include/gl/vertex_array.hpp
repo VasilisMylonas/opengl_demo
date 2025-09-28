@@ -63,6 +63,15 @@ public:
         ibo.unbind();
     }
 
+    void draw(int count)
+    {
+        bind();
+        // TODO: GL_UNSIGNED_INT
+        GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
+        unbind();
+    }
+
+private:
     void bind() const
     {
         GL_CALL(glBindVertexArray(handle_));
@@ -73,7 +82,6 @@ public:
         GL_CALL(glBindVertexArray(0));
     }
 
-private:
     unsigned int handle_ = 0;
 };
 

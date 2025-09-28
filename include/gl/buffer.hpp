@@ -37,7 +37,7 @@ template <typename Type, buffer_target Target>
 class basic_buffer
 {
 public:
-    friend class VertexArray;
+    friend class vertex_array;
 
     basic_buffer(basic_buffer&& other)
     {
@@ -109,6 +109,7 @@ public:
     //     unbind();
     // }
 
+private:
     void bind() const
     {
         GL_CALL(glBindBuffer(static_cast<GLenum>(Target), handle_));
@@ -119,7 +120,6 @@ public:
         GL_CALL(glBindBuffer(static_cast<GLenum>(Target), 0));
     }
 
-private:
     GLuint handle_ = 0;
 };
 
