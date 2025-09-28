@@ -100,6 +100,15 @@ public:
         unbind();
     }
 
+    std::size_t size() const
+    {
+        bind();
+        GL_CALL(GLint size = 0);
+        GL_CALL(glGetBufferParameteriv(static_cast<GLenum>(Target), GL_BUFFER_SIZE, &size));
+        unbind();
+        return size / sizeof(Type);
+    }
+
     // TODO
     // void update(std::size_t count, const Type* data, std::size_t dest_index = 0)
     // {

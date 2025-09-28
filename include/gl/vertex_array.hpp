@@ -2,6 +2,7 @@
 
 #include "gl/buffer.hpp"
 #include "gl/vertex_layout.hpp"
+#include <GL/gl.h>
 
 namespace gl
 {
@@ -61,14 +62,21 @@ public:
         unbind();
         vbo.unbind();
         ibo.unbind();
+
+        ibo_size = ibo.size();
     }
 
-    void draw(int count)
+    void draw(std::size_t count)
     {
         bind();
         // TODO: GL_UNSIGNED_INT, does it matter or is it just for indices?
-        GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
+        GL_CALL(glDrawElements(GL_TRIANGLES, static_cast<int>(count), GL_UNSIGNED_INT, nullptr));
         unbind();
+    }
+
+    void draw()
+    {
+        draw(ibo_size);
     }
 
 private:
@@ -83,6 +91,7 @@ private:
     }
 
     unsigned int handle_ = 0;
+    std::size_t ibo_size = 0;
 };
 
 } // namespace gl
