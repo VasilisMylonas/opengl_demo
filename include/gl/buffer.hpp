@@ -6,7 +6,7 @@
 
 namespace gl
 {
-enum class BufferUsage
+enum class buffer_usage
 {
     static_draw = GL_STATIC_DRAW,
     dynamic_draw = GL_DYNAMIC_DRAW,
@@ -19,41 +19,41 @@ enum class BufferUsage
     stream_copy = GL_STREAM_COPY,
 };
 
-enum class BufferTarget
+enum class buffer_target
 {
     index = GL_ELEMENT_ARRAY_BUFFER,
     array = GL_ARRAY_BUFFER,
     texture = GL_TEXTURE_BUFFER,
 };
 
-enum class BufferAccess
+enum class buffer_access
 {
     read_only = GL_READ_ONLY,
     write_only = GL_WRITE_ONLY,
     read_write = GL_READ_WRITE,
 };
 
-template <typename Type, BufferTarget Target>
-class BasicBuffer
+template <typename Type, buffer_target Target>
+class basic_buffer
 {
 public:
     friend class VertexArray;
 
-    BasicBuffer(BasicBuffer&& other)
+    basic_buffer(basic_buffer&& other)
     {
         handle_ = other.handle_;
         other.handle_ = 0;
     }
 
-    BasicBuffer& operator=(BasicBuffer&& other)
+    basic_buffer& operator=(basic_buffer&& other)
     {
-        this->~BasicBuffer();
+        this->~basic_buffer();
         handle_ = other.handle_;
         other.handle_ = 0;
         return *this;
     }
 
-    BasicBuffer(std::size_t count, BufferUsage usage)
+    basic_buffer(std::size_t count, buffer_usage usage)
     {
         GL_CALL(glGenBuffers(1, &handle_));
         bind();
@@ -64,12 +64,12 @@ public:
         unbind();
     }
 
-    ~BasicBuffer()
+    ~basic_buffer()
     {
         GL_CALL(glDeleteBuffers(1, &handle_));
     }
 
-    Type* map(BufferAccess access)
+    Type* map(buffer_access access)
     {
         bind();
         GL_CALL(Type* ret = glMapBuffer(static_cast<GLenum>(Target), static_cast<GLenum>(access)));
@@ -109,12 +109,12 @@ private:
 };
 
 template <typename T>
-using ArrayBuffer = BasicBuffer<T, BufferTarget::array>;
+using array_buffer = basic_buffer<T, buffer_target::array>;
 
 template <typename T>
-using TextureBuffer = BasicBuffer<T, BufferTarget::texture>;
+using texture_buffer = basic_buffer<T, buffer_target::texture>;
 
 template <typename T>
-using IndexBuffer = BasicBuffer<T, BufferTarget::index>;
+using index_buffer = basic_buffer<T, buffer_target::index>;
 
 } // namespace gl

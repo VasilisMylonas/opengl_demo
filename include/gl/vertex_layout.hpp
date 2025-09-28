@@ -8,7 +8,7 @@
 namespace gl
 {
 
-struct VertexAttribute
+struct vertex_attribute
 {
     unsigned stride;
     unsigned offset;
@@ -67,11 +67,11 @@ inline std::pair<unsigned, int> type_of<glm::vec4>()
 }
 
 #define VERTEX_ATTRIBUTE(type, member)                                                             \
-    gl::VertexAttribute                                                                            \
+    gl::vertex_attribute                                                                           \
     {                                                                                              \
         sizeof(type), offsetof(type, member), gl::type_of<decltype(type::member)>(),               \
     }
 
-using VertexLayout = std::vector<VertexAttribute>;
+using vertex_layout = std::vector<vertex_attribute>;
 
 } // namespace gl

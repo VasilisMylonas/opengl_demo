@@ -39,9 +39,9 @@ public:
     VertexArray& operator=(const VertexArray&) = delete;
 
     template <typename VertexType>
-    void buffers(const ArrayBuffer<VertexType>& vbo,
-                 const IndexBuffer<int>& ibo,
-                 const VertexLayout& layout)
+    void buffers(const array_buffer<VertexType>& vbo,
+                 const index_buffer<int>& ibo,
+                 const vertex_layout& layout)
     {
         bind();
         vbo.bind();
@@ -63,7 +63,7 @@ public:
         ibo.unbind();
     }
 
-protected:
+    // protected:
     void bind() const
     {
         GL_CALL(glBindVertexArray(handle_));

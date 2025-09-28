@@ -12,9 +12,9 @@ struct Vertex
     glm::vec2 uv{0, 0};
     unsigned int texture{0};
 
-    static inline gl::VertexLayout layout()
+    static inline gl::vertex_layout layout()
     {
-        gl::VertexLayout layout;
+        gl::vertex_layout layout;
         layout.push_back(VERTEX_ATTRIBUTE(Vertex, position));
         layout.push_back(VERTEX_ATTRIBUTE(Vertex, normal));
         layout.push_back(VERTEX_ATTRIBUTE(Vertex, color));

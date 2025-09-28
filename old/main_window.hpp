@@ -25,13 +25,13 @@
 class MainWindow : public vcl::Window
 {
 private:
-    gl::VertexBuffer<Vertex> vbo{4, gl::BufferUsage::dynamic_draw};
+    gl::VertexBuffer<Vertex> vbo{4, gl::buffer_usage::dynamic_draw};
     gl::IndexBuffer ibo{6, gl::BufferUsage::dynamic_draw};
     gl::VertexArray vao{};
     gl::Texture tex{0};
-    gl::Program program{};
-    std::optional<gl::Uniform> u_textures{};
-    std::optional<gl::Uniform> u_proj{};
+    gl::program program{};
+    std::optional<gl::uniform> u_textures{};
+    std::optional<gl::uniform> u_proj{};
 
     vcl::FpsCounter counter{};
     vcl::Timer timer{};
@@ -74,8 +74,8 @@ private:
 
     void load_shaders()
     {
-        gl::Shader fs{gl::Shader::ShaderType::fragment};
-        gl::Shader vs{gl::Shader::ShaderType::vertex};
+        gl::shader fs{gl::Shader::shader_type::fragment};
+        gl::shader vs{gl::Shader::shader_type::vertex};
         fs.source_path("../shaders/shader.fs").compile();
         vs.source_path("../shaders/shader.vs").compile();
 

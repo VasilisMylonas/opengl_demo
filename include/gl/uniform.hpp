@@ -6,21 +6,21 @@
 namespace gl
 {
 
-class Uniform
+class uniform
 {
 public:
-    friend class Program;
+    friend class program;
 
-    Uniform(const Uniform&) = delete;
-    Uniform& operator=(const Uniform&) = delete;
+    uniform(const uniform&) = delete;
+    uniform& operator=(const uniform&) = delete;
 
-    Uniform(Uniform&& other) noexcept : program_{other.program_}, location_{other.location_}
+    uniform(uniform&& other) noexcept : program_{other.program_}, location_{other.location_}
     {
         other.program_ = 0;
         other.location_ = -1;
     }
 
-    Uniform& operator=(Uniform&& other) noexcept
+    uniform& operator=(uniform&& other) noexcept
     {
         if (this != &other)
         {
@@ -73,7 +73,7 @@ public:
     }
 
 protected:
-    Uniform(unsigned int program, int location) : program_{program}, location_{location}
+    uniform(unsigned int program, int location) : program_{program}, location_{location}
     {
     }
 

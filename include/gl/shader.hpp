@@ -6,28 +6,28 @@
 
 namespace gl
 {
-enum class ShaderType
+enum class shader_type
 {
     fragment = GL_FRAGMENT_SHADER,
     vertex = GL_VERTEX_SHADER,
 };
 
-class Shader
+class shader
 {
 public:
-    friend class Program;
+    friend class program;
 
-    Shader& operator=(const Shader&) = delete;
-    Shader(const Shader&) = delete;
-    Shader& operator=(Shader&& other) = delete;
-    Shader(Shader&& other) = delete;
+    shader& operator=(const shader&) = delete;
+    shader(const shader&) = delete;
+    shader& operator=(shader&& other) = delete;
+    shader(shader&& other) = delete;
 
-    Shader(ShaderType type)
+    shader(shader_type type)
     {
         GL_CALL(handle_ = glCreateShader(static_cast<GLenum>(type)));
     }
 
-    ~Shader()
+    ~shader()
     {
         GL_CALL(glDeleteShader(handle_));
     }

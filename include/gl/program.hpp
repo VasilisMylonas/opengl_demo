@@ -6,25 +6,26 @@
 
 namespace gl
 {
-class Program
+
+class program
 {
 public:
-    Program()
+    program()
     {
         GL_CALL(handle_ = glCreateProgram());
     }
 
-    ~Program()
+    ~program()
     {
         GL_CALL(glDeleteProgram(handle_));
     }
 
-    Program(const Program&) = delete;
-    Program& operator=(const Program&) = delete;
-    Program(Program&&) = delete;
-    Program& operator=(Program&&) = delete;
+    program(const program&) = delete;
+    program& operator=(const program&) = delete;
+    program(program&&) = delete;
+    program& operator=(program&&) = delete;
 
-    std::optional<Uniform> uniform(const std::string& name) const
+    std::optional<uniform> uniform(const std::string& name) const
     {
         int location = -1;
         GL_CALL(location = glGetUniformLocation(handle_, name.c_str()));
@@ -32,7 +33,7 @@ public:
         {
             return std::nullopt;
         }
-        return Uniform(handle_, location);
+        return uniform(handle_, location);
     }
 
     bool valid() const
@@ -43,12 +44,12 @@ public:
         return status == GL_TRUE;
     }
 
-    void attach(const Shader& shader)
+    void attach(const shader& shader)
     {
         GL_CALL(glAttachShader(handle_, shader.handle_));
     }
 
-    void detach(const Shader& shader)
+    void detach(const shader& shader)
     {
         GL_CALL(glDetachShader(handle_, shader.handle_));
     }
