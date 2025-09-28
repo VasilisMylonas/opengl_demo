@@ -46,7 +46,7 @@ public:
         return *this;
     }
 
-    std::optional<uniform> make_uniform(const std::string& name) const
+    std::optional<uniform> uniform(const std::string& name) const
     {
         int location = -1;
         GL_CALL(location = glGetUniformLocation(handle_, name.c_str()));
@@ -54,7 +54,7 @@ public:
         {
             return std::nullopt;
         }
-        return uniform(handle_, location);
+        return gl::uniform(handle_, location);
     }
 
     bool valid() const
