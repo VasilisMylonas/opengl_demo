@@ -1,26 +1,28 @@
-#include "gl/uniform.hpp"
-#include "glm/ext/quaternion_transform.hpp"
-#include "window.hpp"
 
 #include <array>
 #include <cstdio>
 #include <cstdlib>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/trigonometric.hpp>
 #include <optional>
+
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/trigonometric.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
 #include "gl/buffer.hpp"
 #include "gl/program.hpp"
 #include "gl/shader.hpp"
+#include "gl/texture.hpp"
+#include "gl/uniform.hpp"
 #include "gl/vertex_array.hpp"
 #include "gl/vertex_layout.hpp"
+
 #include "util.hpp"
+#include "window.hpp"
 
 void opengl_message([[maybe_unused]] GLenum source,
                     GLenum type,
@@ -56,7 +58,9 @@ void set_font(const char* font_path, float font_size)
 struct vertex
 {
     glm::vec3 position;
-    glm::vec3 color;
+    glm::vec4 color;
+    glm::vec2 texture_coords = {0.0f, 0.0f};
+    int texture = -1;
 };
 
 class my_app
@@ -64,50 +68,78 @@ class my_app
 public:
     gl::vertex_array vao_0;
     gl::vertex_array vao_1;
+    gl::vertex_array vao_2;
     gl::vertex_buffer<vertex> vbo;
     gl::index_buffer<unsigned int> ibo_0;
     gl::index_buffer<unsigned int> ibo_1;
+    gl::index_buffer<unsigned int> ibo_2;
     gl::program current_program;
+    gl::texture current_texture;
 
     std::optional<gl::uniform> u_color;
     std::optional<gl::uniform> u_mvp;
 
-    std::array<vertex, 9> vertices = {
+    std::array<vertex, 13> vertices = {
         vertex{
             glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
-            glm::vec3(1.0f, 0.0f, 0.0f)     // Red
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(0.5f, -0.5f, -0.5f), // Bottom-Back-Right
-            glm::vec3(0.0f, 1.0f, 0.0f)    // Green
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(0.5f, 0.5f, -0.5f), // Top-Back-Right
-            glm::vec3(0.0f, 0.0f, 1.0f)   // Blue
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(-0.5f, 0.5f, -0.5f), // Top-Back-Left
-            glm::vec3(1.0f, 1.0f, 0.0f)    // Yellow
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(-0.5f, -0.5f, 0.5f), // Bottom-Front-Left
-            glm::vec3(1.0f, 0.0f, 1.0f)    // Magenta
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(0.5f, -0.5f, 0.5f), // Bottom-Front-Right
-            glm::vec3(0.0f, 1.0f, 1.0f)   // Cyan
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(0.5f, 0.5f, 0.5f), // Top-Front-Right
-            glm::vec3(0.5f, 0.5f, 0.5f)  // Gray
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(-0.5f, 0.5f, 0.5f), // Top-Front-Left
-            glm::vec3(1.0f, 0.5f, 0.0f)   // Orange
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
         },
         vertex{
             glm::vec3(0.0f, 0.5f, 0.0f), // Pyramid Top
-            glm::vec3(0.5f, 0.0f, 0.5f)  // Purple
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        },
+
+        vertex{
+            glm::vec3(-0.5f, -0.5f, 0.0f), // Bottom-Left
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            0,
+        },
+        vertex{
+            glm::vec3(0.5f, -0.5f, 0.0f), // Bottom-Right
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            0,
+        },
+        vertex{
+            glm::vec3(0.5f, 0.5f, 0.0f), // Top-Right
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            0,
+        },
+        vertex{
+            glm::vec3(-0.5f, 0.5f, 0.0f), // Top-Left
+            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            0,
         },
     };
 
@@ -142,6 +174,15 @@ public:
         5, 1, 2, 2, 6, 5  // right face
     };
 
+    std::array<unsigned int, 6> indices_2 = {
+        9,
+        10,
+        11,
+        9,
+        11,
+        12,
+    };
+
     bool close = false;
     int shape_selected = 1;
 
@@ -153,13 +194,19 @@ public:
         vbo.data(vertices.size(), vertices.data(), gl::buffer_usage::static_draw);
         ibo_0.data(indices_0.size(), indices_0.data(), gl::buffer_usage::static_draw);
         ibo_1.data(indices_1.size(), indices_1.data(), gl::buffer_usage::static_draw);
+        ibo_2.data(indices_2.size(), indices_2.data(), gl::buffer_usage::static_draw);
 
         gl::vertex_layout layout;
         layout.push_back(VERTEX_ATTRIBUTE(vertex, position));
         layout.push_back(VERTEX_ATTRIBUTE(vertex, color));
+        layout.push_back(VERTEX_ATTRIBUTE(vertex, texture_coords));
+        layout.push_back(VERTEX_ATTRIBUTE(vertex, texture));
 
         vao_0.buffers(vbo, ibo_0, layout);
         vao_1.buffers(vbo, ibo_1, layout);
+        vao_2.buffers(vbo, ibo_2, layout);
+
+        current_texture.load("./image.jpg");
     }
 
     void load_shaders()
@@ -231,6 +278,12 @@ public:
         {
             vao_1.draw();
         }
+        else if (shape_selected == 2)
+        {
+            current_texture.bind();
+            vao_2.draw();
+            current_texture.unbind();
+        }
 
         if (ImGui::BeginMainMenuBar())
         {
@@ -243,7 +296,7 @@ public:
 
                 if (ImGui::BeginMenu("Shape"))
                 {
-                    std::array<const char*, 2> shapes = {"Pyramid", "Cube"};
+                    std::array<const char*, 3> shapes = {"Pyramid", "Cube", "Textured Quad"};
 
                     for (int i = 0; i < shapes.size(); ++i)
                     {
