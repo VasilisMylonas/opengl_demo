@@ -1,9 +1,12 @@
 #include "gl/uniform.hpp"
+#include "glm/ext/quaternion_transform.hpp"
 #include "window.hpp"
 
 #include <array>
 #include <cstdio>
 #include <cstdlib>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
 #include <optional>
 
 #include <GL/glew.h>
@@ -53,46 +56,59 @@ void set_font(const char* font_path, float font_size)
 class my_app
 {
 public:
-    gl::vertex_array vao_triangle;
-    gl::vertex_array vao_square;
+    gl::vertex_array vao_0;
+    gl::vertex_array vao_1;
     gl::vertex_buffer<glm::vec3> vbo;
-    gl::index_buffer<unsigned int> ibo_triangle;
-    gl::index_buffer<unsigned int> ibo_square;
+    gl::index_buffer<unsigned int> ibo_0;
+    gl::index_buffer<unsigned int> ibo_1;
     gl::program current_program;
 
     std::optional<gl::uniform> u_color;
-    std::optional<gl::uniform> u_proj;
+    std::optional<gl::uniform> u_mvp;
 
-    std::array<glm::vec3, 7> vertices = {
-        // Triangle
-        glm::vec3(-0.5f, -0.5f, 0.0f),
-        glm::vec3(0.5f, -0.5f, 0.0f),
-        glm::vec3(0.0f, 0.5f, 0.0f),
+    std::array<glm::vec3, 10> vertices = {
+        // Cube
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, 0.5f, -0.5f),
+        glm::vec3(-0.5f, 0.5f, -0.5f),
 
-        // Square
-        glm::vec3(-0.5f, -0.5f, 0.0f),
-        glm::vec3(-0.5f, 0.5f, 0.0f),
-        glm::vec3(0.5f, 0.5f, 0.0f),
-        glm::vec3(0.5f, -0.5f, 0.0f),
+        glm::vec3(-0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, 0.5f),
+
     };
 
-    std::array<unsigned int, 3> indices_triangle = {
+    std::array<unsigned int, 12> indices_0 = {
         0,
         1,
         2,
+
+        0,
+        1,
+        3,
+
+        0,
+        2,
+        3,
+
+        1,
+        2,
+        3,
     };
 
-    std::array<unsigned int, 6> indices_square = {
-        3,
-        4,
-        5,
-        5,
-        6,
-        3,
+    std::array<unsigned int, 36> indices_1 = {
+        0, 1, 2, 2, 3, 0, // back face
+        4, 5, 6, 6, 7, 4, // front face
+        4, 5, 1, 1, 0, 4, // bottom face
+        7, 6, 2, 2, 3, 7, // top face
+        4, 0, 3, 3, 7, 4, // left face
+        5, 1, 2, 2, 6, 5  // right face
     };
 
     bool close = false;
-    int shape_selected = 0;
+    int shape_selected = 1;
 
     glm::vec3 vertex_color = {0.0f, 0.0f, 0.0f};
     glm::vec3 clear_color = {1.0f, 1.0f, 1.0f};
@@ -100,10 +116,8 @@ public:
     void load_data()
     {
         vbo.data(vertices.size(), vertices.data(), gl::buffer_usage::static_draw);
-        ibo_triangle.data(
-            indices_triangle.size(), indices_triangle.data(), gl::buffer_usage::static_draw);
-        ibo_square.data(
-            indices_square.size(), indices_square.data(), gl::buffer_usage::static_draw);
+        ibo_0.data(indices_0.size(), indices_0.data(), gl::buffer_usage::static_draw);
+        ibo_1.data(indices_1.size(), indices_1.data(), gl::buffer_usage::static_draw);
 
         gl::vertex_layout layout;
         layout.push_back({
@@ -112,8 +126,8 @@ public:
             .type = gl::type_of<glm::vec3>(),
         });
 
-        vao_square.buffers(vbo, ibo_square, layout);
-        vao_triangle.buffers(vbo, ibo_triangle, layout);
+        vao_0.buffers(vbo, ibo_0, layout);
+        vao_1.buffers(vbo, ibo_1, layout);
     }
 
     void load_shaders()
@@ -141,21 +155,49 @@ public:
     void load_uniforms()
     {
         u_color = current_program.uniform("u_color");
-        u_proj = current_program.uniform("u_proj");
+        u_mvp = current_program.uniform("u_mvp");
     }
 
     void render()
     {
+        // Model
+        float angle = static_cast<float>(glfwGetTime()) * 30.0f;
+        glm::mat4 model =
+            glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        // View
+        glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 3.0f), // camera position
+                                     glm::vec3(0.0f, 0.0f, 0.0f), // target
+                                     glm::vec3(0.0f, 1.0f, 0.0f)  // up vector
+        );
+
+        int viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        int windowWidth = viewport[2];
+        int windowHeight = viewport[3];
+
+        // Projection
+        glm::mat4 projection =
+            glm::perspective(glm::radians(45.0f),                      // FOV
+                             (float)windowWidth / (float)windowHeight, // Aspect Ratio
+                             0.1f,
+                             100.0f);
+
+        // MVP
+        glm::mat4 mvp = projection * view * model;
+
+        u_mvp->set(mvp);
+
         glClearColor(clear_color.r, clear_color.g, clear_color.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         if (shape_selected == 0)
         {
-            vao_triangle.draw();
+            vao_0.draw();
         }
         else if (shape_selected == 1)
         {
-            vao_square.draw();
+            vao_1.draw();
         }
         else if (shape_selected == 2)
         {

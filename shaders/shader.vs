@@ -6,7 +6,7 @@ layout(location = 0) in vec3 in_position;
 // layout(location = 3) in vec2 in_uv;
 // layout(location = 4) in uint in_texture;
 
-uniform mat4 u_proj;
+uniform mat4 u_mvp;
 uniform vec3 u_color;
 
 // out vec3 v_color;
@@ -16,8 +16,7 @@ uniform vec3 u_color;
 
 void main()
 {
-    gl_Position = vec4(in_position, 1.0);
-    //  * u_proj;
+    gl_Position = u_mvp * vec4(in_position, 1.0);
 
     // Pass to fragment shader
     // v_uv = in_uv;
