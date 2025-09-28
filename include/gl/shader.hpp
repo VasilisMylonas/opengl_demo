@@ -19,8 +19,27 @@ public:
 
     shader& operator=(const shader&) = delete;
     shader(const shader&) = delete;
-    shader& operator=(shader&& other) = delete;
-    shader(shader&& other) = delete;
+
+    shader& operator=(shader&& other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        this->~shader();
+        handle_ = other.handle_;
+        source_ = std::move(other.source_);
+        other.handle_ = 0;
+        return *this;
+    }
+
+    shader(shader&& other)
+    {
+        handle_ = other.handle_;
+        source_ = std::move(other.source_);
+        other.handle_ = 0;
+    }
 
     shader(shader_type type)
     {
@@ -29,7 +48,10 @@ public:
 
     ~shader()
     {
-        GL_CALL(glDeleteShader(handle_));
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteShader(handle_));
+        }
     }
 
     std::string_view source() const

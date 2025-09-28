@@ -18,13 +18,33 @@ public:
 
     ~program()
     {
-        GL_CALL(glDeleteProgram(handle_));
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteProgram(handle_));
+        }
     }
 
     program(const program&) = delete;
     program& operator=(const program&) = delete;
-    program(program&&) = delete;
-    program& operator=(program&&) = delete;
+
+    program(program&& other)
+    {
+        handle_ = other.handle_;
+        other.handle_ = 0;
+    }
+
+    program& operator=(program&& other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        this->~program();
+        handle_ = other.handle_;
+        other.handle_ = 0;
+        return *this;
+    }
 
     std::optional<uniform> make_uniform(const std::string& name) const
     {
