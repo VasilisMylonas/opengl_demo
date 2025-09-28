@@ -1,3 +1,4 @@
+#include "gl/texture.hpp"
 #include "util.hpp"
 #include "window.hpp"
 
@@ -32,26 +33,6 @@ void set_font(const char* font_path, float font_size)
     }
 }
 
-void load_shaders()
-{
-    gl::shader vs(gl::shader_type::vertex);
-    vs.set_source(read_file("./shaders/shader.vs"));
-    vs.compile();
-    std::cout << vs.info_log() << std::endl;
-
-    gl::shader fs(gl::shader_type::fragment);
-    fs.set_source(read_file("./shaders/shader.fs"));
-    fs.compile();
-    std::cout << fs.info_log() << std::endl;
-
-    gl::program program;
-    program.attach(vs);
-    program.attach(fs);
-    program.link();
-    std::cout << program.info_log() << std::endl;
-    program.use();
-}
-
 std::array<glm::vec3, 3> vertices = {
     glm::vec3(-0.5f, -0.5f, 0.0f),
     glm::vec3(0.5f, -0.5f, 0.0f),
@@ -82,13 +63,30 @@ int main()
         window.make_current();
 
         set_font("./fonts/Roboto-Regular.ttf", 18.0f);
-        load_shaders();
 
-        gl::vertex_buffer<glm::vec3> vbo(vertices.size(), gl::buffer_usage::static_draw);
+        gl::shader vs(gl::shader_type::vertex);
+        vs.set_source(read_file("./shaders/shader.vs"));
+        vs.compile();
+
+        gl::shader fs(gl::shader_type::fragment);
+        fs.set_source(read_file("./shaders/shader.fs"));
+        fs.compile();
+
+        gl::program program;
+        program.attach(vs);
+        program.attach(fs);
+        program.link();
+        program.use();
+
+        gl::texture texture(0);
+        texture.source_path("./image.jpg")
+
+            gl::vertex_buffer<glm::vec3>
+                vbo(vertices.size(), gl::buffer_usage::static_draw);
         gl::index_buffer<unsigned int> ibo(indices.size(), gl::buffer_usage::static_draw);
 
-        vbo.data(vertices.size(), vertices.data());
         ibo.data(indices.size(), indices.data());
+        vbo.data(vertices.size(), vertices.data());
 
         gl::vertex_layout layout;
         layout.push_back({
@@ -97,14 +95,10 @@ int main()
             .type = gl::type_of<glm::vec3>(),
         });
 
-        // gl::enable_blending();
-        window.show();
-
         gl::vertex_array vao;
         vao.buffers(vbo, ibo, layout);
 
-        // Render for window1
-        window.make_current();
+        window.show();
 
         bool close = false;
 
@@ -117,7 +111,9 @@ int main()
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            gl::draw(vao, 3);
+            vao.bind();
+            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+            vao.unbind();
 
             if (ImGui::BeginMainMenuBar())
             {

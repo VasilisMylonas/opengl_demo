@@ -11,15 +11,15 @@
 namespace gl
 {
 
-class Texture
+class texture
 {
 public:
-    Texture(unsigned int slot) : slot_{slot}
+    texture(unsigned int slot) : slot_{slot}
     {
         GL_CALL(glGenTextures(1, &handle_));
     }
 
-    ~Texture()
+    ~texture()
     {
         GL_CALL(glDeleteTextures(1, &handle_));
     }

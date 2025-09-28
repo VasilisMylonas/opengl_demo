@@ -29,7 +29,7 @@ inline void draw(const vertex_array& vao, std::size_t count)
     vao.unbind();
 }
 
-inline void draw_texture(const Texture& texture, const vertex_array& vao, std::size_t count)
+inline void draw_texture(const texture& texture, const vertex_array& vao, std::size_t count)
 {
     // TODO: active texture
     texture.select();
