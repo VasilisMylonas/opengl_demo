@@ -2,13 +2,16 @@
 
 layout(location = 0) out vec4 out_color;
 
-uniform sampler2D u_textures[2];
+// uniform sampler2D u_textures[2];
+// in vec2 v_uv;
+// flat in uint v_texture;
+// in vec3 v_color;
 
-in vec4 v_color;
-in vec2 v_uv;
-flat in uint v_texture;
+uniform vec3 u_color;
 
 void main()
 {
-    out_color = v_color * texture(u_textures[v_texture], v_uv);
+    out_color = vec4(u_color, 1.0);
+
+    // out_color = v_color * texture(u_textures[v_texture], v_uv);
 }

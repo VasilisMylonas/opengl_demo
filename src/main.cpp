@@ -1,11 +1,15 @@
+#include "gl/uniform.hpp"
 #include "window.hpp"
 
 #include <array>
 #include <cstdio>
 #include <cstdlib>
+#include <optional>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
 #include "gl/buffer.hpp"
@@ -14,6 +18,22 @@
 #include "gl/vertex_array.hpp"
 #include "gl/vertex_layout.hpp"
 #include "util.hpp"
+
+void opengl_message([[maybe_unused]] GLenum source,
+                    GLenum type,
+                    [[maybe_unused]] GLuint id,
+                    GLenum severity,
+                    [[maybe_unused]] GLsizei length,
+                    const GLchar* message,
+                    [[maybe_unused]] const void* userParam)
+{
+    fprintf(stderr,
+            "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+            type,
+            severity,
+            message);
+}
 
 void glfw_error([[maybe_unused]] int error, const char* description)
 {
@@ -30,24 +50,6 @@ void set_font(const char* font_path, float font_size)
     }
 }
 
-gl::program load_shaders()
-{
-    gl::shader vs(gl::shader_type::vertex);
-    gl::shader fs(gl::shader_type::fragment);
-
-    vs.set_source(read_file("./shaders/shader.vs"));
-    vs.compile();
-
-    fs.set_source(read_file("./shaders/shader.fs"));
-    fs.compile();
-
-    gl::program program;
-    program.attach(vs);
-    program.attach(fs);
-    program.link();
-    return program;
-}
-
 class my_app
 {
 public:
@@ -56,6 +58,10 @@ public:
     gl::vertex_buffer<glm::vec3> vbo;
     gl::index_buffer<unsigned int> ibo_triangle;
     gl::index_buffer<unsigned int> ibo_square;
+    gl::program current_program;
+
+    std::optional<gl::uniform> u_color;
+    std::optional<gl::uniform> u_proj;
 
     std::array<glm::vec3, 7> vertices = {
         // Triangle
@@ -86,8 +92,10 @@ public:
     };
 
     bool close = false;
-    bool reload_shaders = false;
     int shape_selected = 0;
+
+    glm::vec3 vertex_color = {0.0f, 0.0f, 0.0f};
+    glm::vec3 clear_color = {1.0f, 1.0f, 1.0f};
 
     void load_data()
     {
@@ -108,9 +116,37 @@ public:
         vao_triangle.buffers(vbo, ibo_triangle, layout);
     }
 
+    void load_shaders()
+    {
+        gl::shader vs(gl::shader_type::vertex);
+        gl::shader fs(gl::shader_type::fragment);
+
+        vs.set_source(read_file("./shaders/shader.vs"));
+        vs.compile();
+
+        fs.set_source(read_file("./shaders/shader.fs"));
+        fs.compile();
+
+        gl::program program;
+        program.attach(vs);
+        program.attach(fs);
+        program.link();
+        program.use();
+
+        current_program = std::move(program);
+
+        load_uniforms();
+    }
+
+    void load_uniforms()
+    {
+        u_color = current_program.uniform("u_color");
+        u_proj = current_program.uniform("u_proj");
+    }
+
     void render()
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(clear_color.r, clear_color.g, clear_color.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         if (shape_selected == 0)
@@ -123,19 +159,16 @@ public:
         }
         else if (shape_selected == 2)
         {
-            // vao_triangle.draw();
+            // TODO: circle
         }
-    }
 
-    void render_imgui()
-    {
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("File"))
             {
                 if (ImGui::MenuItem("Reload Shaders"))
                 {
-                    reload_shaders = true;
+                    load_shaders();
                 }
 
                 if (ImGui::BeginMenu("Shape"))
@@ -161,6 +194,17 @@ public:
 
             ImGui::EndMainMenuBar();
         }
+
+        if (ImGui::Begin("Color Selection"))
+        {
+            ImGui::ColorEdit3("Background Color", glm::value_ptr(clear_color));
+
+            if (ImGui::ColorEdit3("Foreground Color", glm::value_ptr(vertex_color)))
+            {
+                u_color->set(vertex_color);
+            }
+        }
+        ImGui::End(); // This needs to be outside `if`
     }
 };
 
@@ -185,27 +229,19 @@ int main()
 
         my_app app;
         app.load_data();
+        app.load_shaders();
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        gl::program program = load_shaders();
-        program.use();
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(opengl_message, nullptr);
 
         while (!window.should_close() && !app.close)
         {
-            if (app.reload_shaders)
-            {
-                program = load_shaders();
-                program.use();
-                app.reload_shaders = false;
-            }
-
             glfwPollEvents();
 
             window.begin_frame();
             app.render();
-            app.render_imgui();
             window.end_frame();
 
             window.swap_buffers();
