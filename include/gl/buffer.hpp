@@ -47,26 +47,31 @@ public:
 
     basic_buffer& operator=(basic_buffer&& other)
     {
+        if (this == &other)
+        {
+            return *this;
+        }
+
         this->~basic_buffer();
         handle_ = other.handle_;
         other.handle_ = 0;
         return *this;
     }
 
-    basic_buffer(std::size_t count, buffer_usage usage)
+    basic_buffer(const basic_buffer&) = delete;
+    basic_buffer& operator=(const basic_buffer&) = delete;
+
+    basic_buffer()
     {
         GL_CALL(glGenBuffers(1, &handle_));
-        bind();
-        GL_CALL(glBufferData(static_cast<GLenum>(Target),
-                             static_cast<GLsizeiptr>(count) * sizeof(Type),
-                             nullptr,
-                             static_cast<GLenum>(usage)));
-        unbind();
     }
 
     ~basic_buffer()
     {
-        GL_CALL(glDeleteBuffers(1, &handle_));
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteBuffers(1, &handle_));
+        }
     }
 
     Type* map(buffer_access access)
@@ -85,13 +90,24 @@ public:
         return ret;
     }
 
-    void data(std::size_t count, const Type* data, std::size_t dest_index = 0)
+    void data(std::size_t count, const Type* data, buffer_usage usage)
     {
         bind();
-        GL_CALL(glBufferSubData(
-            static_cast<GLenum>(Target), dest_index * sizeof(Type), count * sizeof(Type), data));
+        GL_CALL(glBufferData(static_cast<GLenum>(Target),
+                             static_cast<GLsizeiptr>(count) * sizeof(Type),
+                             data,
+                             static_cast<GLenum>(usage)));
         unbind();
     }
+
+    // TODO
+    // void update(std::size_t count, const Type* data, std::size_t dest_index = 0)
+    // {
+    //     bind();
+    //     GL_CALL(glBufferSubData(
+    //         static_cast<GLenum>(Target), dest_index * sizeof(Type), count * sizeof(Type), data));
+    //     unbind();
+    // }
 
     void bind() const
     {
