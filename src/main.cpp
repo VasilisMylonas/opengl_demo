@@ -53,12 +53,18 @@ void set_font(const char* font_path, float font_size)
     }
 }
 
+struct vertex
+{
+    glm::vec3 position;
+    glm::vec3 color;
+};
+
 class my_app
 {
 public:
     gl::vertex_array vao_0;
     gl::vertex_array vao_1;
-    gl::vertex_buffer<glm::vec3> vbo;
+    gl::vertex_buffer<vertex> vbo;
     gl::index_buffer<unsigned int> ibo_0;
     gl::index_buffer<unsigned int> ibo_1;
     gl::program current_program;
@@ -66,18 +72,43 @@ public:
     std::optional<gl::uniform> u_color;
     std::optional<gl::uniform> u_mvp;
 
-    std::array<glm::vec3, 9> vertices = {
-        glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
-        glm::vec3(0.5f, -0.5f, -0.5f),  // Bottom-Back-Right
-        glm::vec3(0.5f, 0.5f, -0.5f),   // Top-Back-Right
-        glm::vec3(-0.5f, 0.5f, -0.5f),  // Top-Back-Left
-
-        glm::vec3(-0.5f, -0.5f, 0.5f), // Bottom-Front-Left
-        glm::vec3(0.5f, -0.5f, 0.5f),  // Bottom-Front-Right
-        glm::vec3(0.5f, 0.5f, 0.5f),   // Top-Front-Right
-        glm::vec3(-0.5f, 0.5f, 0.5f),  // Top-Front-Left
-
-        glm::vec3(0.0f, 0.5f, 0.0f), // Pyramid Top
+    std::array<vertex, 9> vertices = {
+        vertex{
+            glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
+            glm::vec3(1.0f, 0.0f, 0.0f)     // Red
+        },
+        vertex{
+            glm::vec3(0.5f, -0.5f, -0.5f), // Bottom-Back-Right
+            glm::vec3(0.0f, 1.0f, 0.0f)    // Green
+        },
+        vertex{
+            glm::vec3(0.5f, 0.5f, -0.5f), // Top-Back-Right
+            glm::vec3(0.0f, 0.0f, 1.0f)   // Blue
+        },
+        vertex{
+            glm::vec3(-0.5f, 0.5f, -0.5f), // Top-Back-Left
+            glm::vec3(1.0f, 1.0f, 0.0f)    // Yellow
+        },
+        vertex{
+            glm::vec3(-0.5f, -0.5f, 0.5f), // Bottom-Front-Left
+            glm::vec3(1.0f, 0.0f, 1.0f)    // Magenta
+        },
+        vertex{
+            glm::vec3(0.5f, -0.5f, 0.5f), // Bottom-Front-Right
+            glm::vec3(0.0f, 1.0f, 1.0f)   // Cyan
+        },
+        vertex{
+            glm::vec3(0.5f, 0.5f, 0.5f), // Top-Front-Right
+            glm::vec3(0.5f, 0.5f, 0.5f)  // Gray
+        },
+        vertex{
+            glm::vec3(-0.5f, 0.5f, 0.5f), // Top-Front-Left
+            glm::vec3(1.0f, 0.5f, 0.0f)   // Orange
+        },
+        vertex{
+            glm::vec3(0.0f, 0.5f, 0.0f), // Pyramid Top
+            glm::vec3(0.5f, 0.0f, 0.5f)  // Purple
+        },
     };
 
     std::array<unsigned int, 30> indices_0 = {
@@ -124,11 +155,8 @@ public:
         ibo_1.data(indices_1.size(), indices_1.data(), gl::buffer_usage::static_draw);
 
         gl::vertex_layout layout;
-        layout.push_back({
-            .stride = sizeof(glm::vec3),
-            .offset = 0,
-            .type = gl::type_of<glm::vec3>(),
-        });
+        layout.push_back(VERTEX_ATTRIBUTE(vertex, position));
+        layout.push_back(VERTEX_ATTRIBUTE(vertex, color));
 
         vao_0.buffers(vbo, ibo_0, layout);
         vao_1.buffers(vbo, ibo_1, layout);
