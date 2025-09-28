@@ -30,11 +30,28 @@ void set_font(const char* font_path, float font_size)
     }
 }
 
+gl::program load_shaders()
+{
+    gl::shader vs(gl::shader_type::vertex);
+    gl::shader fs(gl::shader_type::fragment);
+
+    vs.set_source(read_file("./shaders/shader.vs"));
+    vs.compile();
+
+    fs.set_source(read_file("./shaders/shader.fs"));
+    fs.compile();
+
+    gl::program program;
+    program.attach(vs);
+    program.attach(fs);
+    program.link();
+    return program;
+}
+
 class my_app
 {
 public:
     gl::vertex_array vao;
-    gl::program program;
     gl::vertex_buffer<glm::vec3> vbo;
     gl::index_buffer<unsigned int> ibo;
 
@@ -56,32 +73,6 @@ public:
     {
         vbo.data(vertices.size(), vertices.data(), gl::buffer_usage::static_draw);
         ibo.data(indices.size(), indices.data(), gl::buffer_usage::static_draw);
-    }
-
-    void load_shaders()
-    {
-        gl::shader vs(gl::shader_type::vertex);
-        gl::shader fs(gl::shader_type::fragment);
-
-        vs.set_source(read_file("./shaders/shader.vs"));
-        vs.compile();
-
-        fs.set_source(read_file("./shaders/shader.fs"));
-        fs.compile();
-
-        program.attach(vs);
-        program.attach(fs);
-        program.link();
-        program.use();
-    }
-
-    void init()
-    {
-        load_shaders();
-        load_data();
-
-        // gl::texture texture(0);
-        // texture.source_path("./image.jpg");
 
         gl::vertex_layout layout;
         layout.push_back({
@@ -99,9 +90,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         vao.draw(3);
-        // vao.bind();
-        // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        // vao.unbind();
 
         if (ImGui::BeginMainMenuBar())
         {
@@ -144,10 +132,13 @@ int main()
         window.show();
 
         my_app app;
-        app.init();
+        app.load_data();
 
         while (!window.should_close() && !app.close)
         {
+            gl::program program = load_shaders();
+            program.use();
+
             glfwPollEvents();
 
             window.begin_frame();
