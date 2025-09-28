@@ -52,6 +52,18 @@ void load_shaders()
     program.use();
 }
 
+std::array<glm::vec3, 3> vertices = {
+    glm::vec3(-0.5f, -0.5f, 0.0f),
+    glm::vec3(0.5f, -0.5f, 0.0f),
+    glm::vec3(0.0f, 0.5f, 0.0f),
+};
+
+std::array<unsigned int, 3> indices = {
+    0,
+    1,
+    2,
+};
+
 int main()
 {
     glfwSetErrorCallback(glfw_error);
@@ -72,20 +84,6 @@ int main()
         set_font("./fonts/Roboto-Regular.ttf", 18.0f);
         load_shaders();
 
-        window.show();
-
-        std::array<glm::vec3, 3> vertices = {
-            glm::vec3(-0.5f, -0.5f, 0.0f),
-            glm::vec3(0.5f, -0.5f, 0.0f),
-            glm::vec3(0.0f, 0.5f, 0.0f),
-        };
-
-        std::array<unsigned int, 3> indices = {
-            0,
-            1,
-            2,
-        };
-
         gl::vertex_buffer<glm::vec3> vbo(vertices.size(), gl::buffer_usage::static_draw);
         gl::index_buffer<unsigned int> ibo(indices.size(), gl::buffer_usage::static_draw);
 
@@ -100,9 +98,13 @@ int main()
         });
 
         // gl::enable_blending();
+        window.show();
 
         gl::vertex_array vao;
         vao.buffers(vbo, ibo, layout);
+
+        // Render for window1
+        window.make_current();
 
         bool close = false;
 
@@ -110,37 +112,33 @@ int main()
         {
             glfwPollEvents();
 
-            // Render for window1
-            window.make_current();
-
             window.begin_frame();
 
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            vao.bind();
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-            vao.unbind();
+            gl::draw(vao, 3);
 
-            // if (ImGui::BeginMainMenuBar())
-            // {
-            //     if (ImGui::BeginMenu("File"))
-            //     {
-            //         if (ImGui::MenuItem("Exit"))
-            //         {
-            //             close = true;
-            //         }
-            //         ImGui::EndMenu();
-            //     }
-            //     if (ImGui::BeginMenu("Help"))
-            //     {
-            //         ImGui::MenuItem("About");
-            //         ImGui::EndMenu();
-            //     }
-            //     ImGui::EndMainMenuBar();
-            // }
+            if (ImGui::BeginMainMenuBar())
+            {
+                if (ImGui::BeginMenu("File"))
+                {
+                    if (ImGui::MenuItem("Exit"))
+                    {
+                        close = true;
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Help"))
+                {
+                    ImGui::MenuItem("About");
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMainMenuBar();
+            }
 
             window.end_frame();
+
             window.swap_buffers();
         }
     }
