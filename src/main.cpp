@@ -280,6 +280,7 @@ public:
         }
         else if (shape_selected == 2)
         {
+            glActiveTexture(GL_TEXTURE0);
             current_texture.bind();
             vao_2.draw();
             current_texture.unbind();

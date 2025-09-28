@@ -73,8 +73,6 @@ public:
 
     void bind() const
     {
-        // TODO
-        // GL_CALL(glActiveTexture(GL_TEXTURE0 + unit));
         GL_CALL(glBindTexture(GL_TEXTURE_2D, handle_));
     }
 
