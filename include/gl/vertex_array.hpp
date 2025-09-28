@@ -66,7 +66,7 @@ public:
     void draw(int count)
     {
         bind();
-        // TODO: GL_UNSIGNED_INT
+        // TODO: GL_UNSIGNED_INT, does it matter or is it just for indices?
         GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
         unbind();
     }

@@ -22,7 +22,7 @@ enum class buffer_usage
 enum class buffer_target
 {
     index = GL_ELEMENT_ARRAY_BUFFER,
-    array = GL_ARRAY_BUFFER,
+    vertex = GL_ARRAY_BUFFER,
     texture = GL_TEXTURE_BUFFER,
 };
 
@@ -124,7 +124,7 @@ private:
 };
 
 template <typename T>
-using vertex_buffer = basic_buffer<T, buffer_target::array>;
+using vertex_buffer = basic_buffer<T, buffer_target::vertex>;
 
 template <typename T>
 using texture_buffer = basic_buffer<T, buffer_target::texture>;
