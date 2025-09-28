@@ -52,6 +52,16 @@ public:
         GL_CALL(glProgramUniform4f(program_, location_, vec.x, vec.y, vec.z, vec.w));
     }
 
+    void set(const glm::mat2& mat)
+    {
+        GL_CALL(glProgramUniformMatrix2fv(program_, location_, 1, false, &mat[0][0]));
+    }
+
+    void set(const glm::mat3& mat)
+    {
+        GL_CALL(glProgramUniformMatrix3fv(program_, location_, 1, false, &mat[0][0]));
+    }
+
     void set(const glm::mat4& mat)
     {
         GL_CALL(glProgramUniformMatrix4fv(program_, location_, 1, false, &mat[0][0]));
