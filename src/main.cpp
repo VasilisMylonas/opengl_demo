@@ -66,36 +66,40 @@ public:
     std::optional<gl::uniform> u_color;
     std::optional<gl::uniform> u_mvp;
 
-    std::array<glm::vec3, 10> vertices = {
-        // Cube
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, 0.5f, -0.5f),
+    std::array<glm::vec3, 9> vertices = {
+        glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
+        glm::vec3(0.5f, -0.5f, -0.5f),  // Bottom-Back-Right
+        glm::vec3(0.5f, 0.5f, -0.5f),   // Top-Back-Right
+        glm::vec3(-0.5f, 0.5f, -0.5f),  // Top-Back-Left
 
-        glm::vec3(-0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, -0.5f, 0.5f), // Bottom-Front-Left
+        glm::vec3(0.5f, -0.5f, 0.5f),  // Bottom-Front-Right
+        glm::vec3(0.5f, 0.5f, 0.5f),   // Top-Front-Right
+        glm::vec3(-0.5f, 0.5f, 0.5f),  // Top-Front-Left
 
+        glm::vec3(0.0f, 0.5f, 0.0f), // Pyramid Top
     };
 
-    std::array<unsigned int, 12> indices_0 = {
+    std::array<unsigned int, 30> indices_0 = {
         0,
         1,
-        2,
-
+        4,
+        1,
+        4,
+        5, // Base
+        0,
+        4,
+        8, // Left
+        1,
+        5,
+        8, // Right
         0,
         1,
-        3,
+        8, // Back,
+        4,
+        5,
+        8 // Front
 
-        0,
-        2,
-        3,
-
-        1,
-        2,
-        3,
     };
 
     std::array<unsigned int, 36> indices_1 = {
@@ -161,12 +165,12 @@ public:
     void render()
     {
         // Model
-        float angle = static_cast<float>(glfwGetTime()) * 30.0f;
+        float angle = static_cast<float>(glfwGetTime()) * 50;
         glm::mat4 model =
             glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
         // View
-        glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 3.0f), // camera position
+        glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), // camera position
                                      glm::vec3(0.0f, 0.0f, 0.0f), // target
                                      glm::vec3(0.0f, 1.0f, 0.0f)  // up vector
         );
@@ -199,10 +203,6 @@ public:
         {
             vao_1.draw();
         }
-        else if (shape_selected == 2)
-        {
-            // TODO: circle
-        }
 
         if (ImGui::BeginMainMenuBar())
         {
@@ -215,9 +215,9 @@ public:
 
                 if (ImGui::BeginMenu("Shape"))
                 {
-                    const char* shapes[] = {"Triangle", "Square", "Circle"};
+                    std::array<const char*, 2> shapes = {"Pyramid", "Cube"};
 
-                    for (int i = 0; i < 3; ++i)
+                    for (int i = 0; i < shapes.size(); ++i)
                     {
                         if (ImGui::MenuItem(shapes[i], nullptr, shape_selected == i))
                         {
