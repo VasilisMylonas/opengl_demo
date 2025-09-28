@@ -5,26 +5,26 @@
 
 namespace gl
 {
-class VertexArray
+class vertex_array
 {
 public:
-    VertexArray()
+    vertex_array()
     {
         GL_CALL(glGenVertexArrays(1, &handle_));
     }
 
-    ~VertexArray()
+    ~vertex_array()
     {
         GL_CALL(glDeleteVertexArrays(1, &handle_));
     }
 
-    VertexArray(VertexArray&& other)
+    vertex_array(vertex_array&& other)
     {
         handle_ = other.handle_;
         other.handle_ = 0;
     }
 
-    VertexArray& operator=(VertexArray&& other)
+    vertex_array& operator=(vertex_array&& other)
     {
         if (this != &other)
         {
@@ -35,12 +35,12 @@ public:
         return *this;
     }
 
-    VertexArray(const VertexArray&) = delete;
-    VertexArray& operator=(const VertexArray&) = delete;
+    vertex_array(const vertex_array&) = delete;
+    vertex_array& operator=(const vertex_array&) = delete;
 
-    template <typename VertexType>
-    void buffers(const array_buffer<VertexType>& vbo,
-                 const index_buffer<int>& ibo,
+    template <typename VertexType, typename IndexType>
+    void buffers(const vertex_buffer<VertexType>& vbo,
+                 const index_buffer<IndexType>& ibo,
                  const vertex_layout& layout)
     {
         bind();
@@ -63,7 +63,6 @@ public:
         ibo.unbind();
     }
 
-    // protected:
     void bind() const
     {
         GL_CALL(glBindVertexArray(handle_));

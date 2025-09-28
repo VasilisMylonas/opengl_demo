@@ -3,6 +3,9 @@
 #include <cstdio>
 #include <sys/stat.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 std::string read_file(const std::string& path)
 {
     FILE* f = fopen(path.c_str(), "rb");

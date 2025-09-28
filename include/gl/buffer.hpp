@@ -93,7 +93,6 @@ public:
         unbind();
     }
 
-protected:
     void bind() const
     {
         GL_CALL(glBindBuffer(static_cast<GLenum>(Target), handle_));
@@ -109,7 +108,7 @@ private:
 };
 
 template <typename T>
-using array_buffer = basic_buffer<T, buffer_target::array>;
+using vertex_buffer = basic_buffer<T, buffer_target::array>;
 
 template <typename T>
 using texture_buffer = basic_buffer<T, buffer_target::texture>;

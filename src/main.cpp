@@ -12,6 +12,7 @@
 
 #include "gl/buffer.hpp"
 #include "gl/program.hpp"
+#include "gl/renderer.hpp"
 #include "gl/shader.hpp"
 #include "gl/vertex_array.hpp"
 #include "gl/vertex_layout.hpp"
@@ -31,6 +32,26 @@ void set_font(const char* font_path, float font_size)
     }
 }
 
+void load_shaders()
+{
+    gl::shader vs(gl::shader_type::vertex);
+    vs.set_source(read_file("./shaders/shader.vs"));
+    vs.compile();
+    std::cout << vs.info_log() << std::endl;
+
+    gl::shader fs(gl::shader_type::fragment);
+    fs.set_source(read_file("./shaders/shader.fs"));
+    fs.compile();
+    std::cout << fs.info_log() << std::endl;
+
+    gl::program program;
+    program.attach(vs);
+    program.attach(fs);
+    program.link();
+    std::cout << program.info_log() << std::endl;
+    program.use();
+}
+
 int main()
 {
     glfwSetErrorCallback(glfw_error);
@@ -47,11 +68,11 @@ int main()
         window.swap_interval(1); // Enable vsync
 
         window.make_current();
+
         set_font("./fonts/Roboto-Regular.ttf", 18.0f);
+        load_shaders();
 
         window.show();
-
-        bool close = false;
 
         std::array<glm::vec3, 3> vertices = {
             glm::vec3(-0.5f, -0.5f, 0.0f),
@@ -59,34 +80,17 @@ int main()
             glm::vec3(0.0f, 0.5f, 0.0f),
         };
 
-        std::array<int, 3> indices = {
+        std::array<unsigned int, 3> indices = {
             0,
             1,
             2,
         };
 
-        gl::shader vs(gl::shader_type::vertex);
-        vs.set_source(read_file("./shaders/shader.vs"));
-        vs.compile();
-        std::cout << vs.info_log() << std::endl;
+        gl::vertex_buffer<glm::vec3> vbo(vertices.size(), gl::buffer_usage::static_draw);
+        gl::index_buffer<unsigned int> ibo(indices.size(), gl::buffer_usage::static_draw);
 
-        gl::shader fs(gl::shader_type::fragment);
-        fs.set_source(read_file("./shaders/shader.fs"));
-        fs.compile();
-        std::cout << fs.info_log() << std::endl;
-
-        gl::program program;
-        program.attach(vs);
-        program.attach(fs);
-        program.link();
-        std::cout << program.info_log() << std::endl;
-        program.use();
-
-        gl::array_buffer<glm::vec3> vbo(vertices.size(), gl::buffer_usage::static_draw);
-        gl::index_buffer<int> ibo(indices.size(), gl::buffer_usage::static_draw);
-
-        ibo.data(indices.size(), indices.data());
         vbo.data(vertices.size(), vertices.data());
+        ibo.data(indices.size(), indices.data());
 
         gl::vertex_layout layout;
         layout.push_back({
@@ -95,8 +99,12 @@ int main()
             .type = gl::type_of<glm::vec3>(),
         });
 
-        gl::VertexArray vao;
+        // gl::enable_blending();
+
+        gl::vertex_array vao;
         vao.buffers(vbo, ibo, layout);
+
+        bool close = false;
 
         while (!window.should_close() && !close)
         {
@@ -104,6 +112,7 @@ int main()
 
             // Render for window1
             window.make_current();
+
             window.begin_frame();
 
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -113,23 +122,23 @@ int main()
             glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
             vao.unbind();
 
-            if (ImGui::BeginMainMenuBar())
-            {
-                if (ImGui::BeginMenu("File"))
-                {
-                    if (ImGui::MenuItem("Exit"))
-                    {
-                        close = true;
-                    }
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("Help"))
-                {
-                    ImGui::MenuItem("About");
-                    ImGui::EndMenu();
-                }
-                ImGui::EndMainMenuBar();
-            }
+            // if (ImGui::BeginMainMenuBar())
+            // {
+            //     if (ImGui::BeginMenu("File"))
+            //     {
+            //         if (ImGui::MenuItem("Exit"))
+            //         {
+            //             close = true;
+            //         }
+            //         ImGui::EndMenu();
+            //     }
+            //     if (ImGui::BeginMenu("Help"))
+            //     {
+            //         ImGui::MenuItem("About");
+            //         ImGui::EndMenu();
+            //     }
+            //     ImGui::EndMainMenuBar();
+            // }
 
             window.end_frame();
             window.swap_buffers();

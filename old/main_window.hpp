@@ -24,7 +24,7 @@
 
 gl::VertexBuffer<vertex> vbo{4, gl::buffer_usage::dynamic_draw};
 gl::IndexBuffer ibo{6, gl::BufferUsage::dynamic_draw};
-gl::VertexArray vao{};
+gl::vertex_array vao{};
 gl::Texture tex{0};
 gl::program program{};
 std::optional<gl::uniform> u_textures{};

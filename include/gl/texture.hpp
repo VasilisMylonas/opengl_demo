@@ -6,7 +6,6 @@
 #include "gl/errors.hpp"
 #include <GL/glew.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 namespace gl
@@ -15,8 +14,6 @@ namespace gl
 class Texture
 {
 public:
-    friend class Renderer;
-
     Texture(unsigned int slot) : slot_{slot}
     {
         GL_CALL(glGenTextures(1, &handle_));
@@ -27,7 +24,7 @@ public:
         GL_CALL(glDeleteTextures(1, &handle_));
     }
 
-    Texture& source_path(const std::string& path)
+    void source_path(const std::string& path)
     {
         stbi_set_flip_vertically_on_load_thread(true);
 
@@ -49,8 +46,6 @@ public:
         unbind();
 
         stbi_image_free(data);
-
-        return *this;
     }
 
     unsigned int slot() const
@@ -58,13 +53,11 @@ public:
         return slot_;
     }
 
-    Texture& slot(unsigned int slot)
+    void set_slot(unsigned int slot)
     {
         slot_ = slot;
-        return *this;
     }
 
-protected:
     void bind() const
     {
         GL_CALL(glBindTexture(GL_TEXTURE_2D, handle_));
