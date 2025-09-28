@@ -8,9 +8,16 @@ in vec2 v_texture_coords;
 uniform mat4 u_mvp;
 uniform vec3 u_color;
 uniform sampler2D u_texture;
+uniform bool u_use_texture;
 
 void main()
 {
-    out_color = texture(u_texture, v_texture_coords) * vec4(u_color, 1.0);
-    // out_color = vec4(u_color, 1.0);
+    if (!u_use_texture)
+    {
+        out_color = vec4(u_color, 1.0);
+    }
+    else
+    {
+        out_color = texture(u_texture, v_texture_coords) * vec4(u_color, 1.0);
+    }
 }

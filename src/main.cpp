@@ -60,7 +60,6 @@ struct vertex
     glm::vec3 position;
     glm::vec4 color;
     glm::vec2 texture_coords = {0.0f, 0.0f};
-    int texture = -1;
 };
 
 class my_app
@@ -78,6 +77,8 @@ public:
 
     std::optional<gl::uniform> u_color;
     std::optional<gl::uniform> u_mvp;
+    std::optional<gl::uniform> u_texture;
+    std::optional<gl::uniform> u_use_texture;
 
     std::array<vertex, 13> vertices = {
         vertex{
@@ -121,25 +122,21 @@ public:
             glm::vec3(-0.5f, -0.5f, 0.0f), // Bottom-Left
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
             glm::vec2(0.0f, 0.0f),
-            0,
         },
         vertex{
             glm::vec3(0.5f, -0.5f, 0.0f), // Bottom-Right
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
             glm::vec2(1.0f, 0.0f),
-            0,
         },
         vertex{
             glm::vec3(0.5f, 0.5f, 0.0f), // Top-Right
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
             glm::vec2(1.0f, 1.0f),
-            0,
         },
         vertex{
             glm::vec3(-0.5f, 0.5f, 0.0f), // Top-Left
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
             glm::vec2(0.0f, 1.0f),
-            0,
         },
     };
 
@@ -186,7 +183,7 @@ public:
     bool close = false;
     int shape_selected = 1;
 
-    glm::vec3 vertex_color = {0.0f, 0.0f, 0.0f};
+    glm::vec3 vertex_color = {1.0f, 0.5f, 0.5f};
     glm::vec3 clear_color = {1.0f, 1.0f, 1.0f};
 
     void load_data()
@@ -200,7 +197,6 @@ public:
         layout.push_back(VERTEX_ATTRIBUTE(vertex, position));
         layout.push_back(VERTEX_ATTRIBUTE(vertex, color));
         layout.push_back(VERTEX_ATTRIBUTE(vertex, texture_coords));
-        layout.push_back(VERTEX_ATTRIBUTE(vertex, texture));
 
         vao_0.buffers(vbo, ibo_0, layout);
         vao_1.buffers(vbo, ibo_1, layout);
@@ -235,6 +231,8 @@ public:
     {
         u_color = current_program.uniform("u_color");
         u_mvp = current_program.uniform("u_mvp");
+        u_texture = current_program.uniform("u_texture");
+        u_use_texture = current_program.uniform("u_use_texture");
     }
 
     void render()
@@ -266,20 +264,25 @@ public:
         glm::mat4 mvp = projection * view * model;
 
         u_mvp->set(mvp);
+        u_texture->set(0);
+        u_color->set(vertex_color);
 
         glClearColor(clear_color.r, clear_color.g, clear_color.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         if (shape_selected == 0)
         {
+            u_use_texture->set(false);
             vao_0.draw();
         }
         else if (shape_selected == 1)
         {
+            u_use_texture->set(false);
             vao_1.draw();
         }
         else if (shape_selected == 2)
         {
+            u_use_texture->set(true);
             glActiveTexture(GL_TEXTURE0);
             current_texture.bind();
             vao_2.draw();
@@ -322,11 +325,7 @@ public:
         if (ImGui::Begin("Color Selection"))
         {
             ImGui::ColorEdit3("Background Color", glm::value_ptr(clear_color));
-
-            if (ImGui::ColorEdit3("Foreground Color", glm::value_ptr(vertex_color)))
-            {
-                u_color->set(vertex_color);
-            }
+            ImGui::ColorEdit3("Foreground Color", glm::value_ptr(vertex_color));
         }
         ImGui::End(); // This needs to be outside `if`
     }
