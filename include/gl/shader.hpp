@@ -42,6 +42,22 @@ public:
         source_ = source;
     }
 
+    std::string info_log() const
+    {
+        std::string log;
+
+        int length = 0;
+        GL_CALL(glGetShaderiv(handle_, GL_INFO_LOG_LENGTH, &length));
+
+        if (length > 0)
+        {
+            log.resize(length);
+            GL_CALL(glGetShaderInfoLog(handle_, length, &length, log.data()));
+        }
+
+        return log;
+    }
+
     void compile()
     {
         const char* source_array[1] = {source_.data()};

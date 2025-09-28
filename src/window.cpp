@@ -10,12 +10,12 @@
 #include <imgui_impl_opengl3.h>
 #endif
 
-static Window* get_wrapper(GLFWwindow* handle)
+static window* get_wrapper(GLFWwindow* handle)
 {
-    return static_cast<Window*>(glfwGetWindowUserPointer(handle));
+    return static_cast<window*>(glfwGetWindowUserPointer(handle));
 }
 
-void Window::with_context(std::function<void()> function)
+void window::with_context(std::function<void()> function)
 {
     auto g = glfwGetCurrentContext();
 
@@ -33,7 +33,7 @@ void Window::with_context(std::function<void()> function)
     previous->make_current();
 }
 
-void Window::begin_frame()
+void window::begin_frame()
 {
 #if IMGUI_INTEGRATION
     ImGui_ImplOpenGL3_NewFrame();
@@ -42,7 +42,7 @@ void Window::begin_frame()
 #endif
 }
 
-void Window::end_frame()
+void window::end_frame()
 {
 #if IMGUI_INTEGRATION
     ImGui::Render();
@@ -50,19 +50,19 @@ void Window::end_frame()
 #endif
 }
 
-void Window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
+void window::on_mouse_scroll_internal(GLFWwindow* window, double x_offset, double y_offset)
 {
     auto self = get_wrapper(window);
     self->scroll_delta_ = {x_offset, y_offset};
 }
 
-void Window::on_resize_internal(GLFWwindow* window, int width, int height)
+void window::on_resize_internal(GLFWwindow* window, int width, int height)
 {
     auto self = get_wrapper(window);
     self->with_context([width, height]() { glViewport(0, 0, width, height); });
 }
 
-void Window::make_current()
+void window::make_current()
 {
     glfwMakeContextCurrent(handle_);
 
@@ -80,7 +80,7 @@ void Window::make_current()
     }
 }
 
-Window::Window(
+window::window(
     int width, int height, const char* title, int opengl_major_version, int opengl_minor_version)
     : scroll_delta_{0, 0}
 {
@@ -124,7 +124,7 @@ Window::Window(
     on_resize_internal(handle_, width, height);
 }
 
-Window::~Window()
+window::~window()
 {
     if (!handle_)
     {
@@ -145,7 +145,7 @@ Window::~Window()
     handle_ = nullptr;
 }
 
-Window::Window(Window&& other)
+window::window(window&& other)
 {
     handle_ = other.handle_;
 #if IMGUI_INTEGRATION
@@ -159,9 +159,9 @@ Window::Window(Window&& other)
 #endif
 }
 
-Window& Window::operator=(Window&& other)
+window& window::operator=(window&& other)
 {
-    this->~Window();
+    this->~window();
     handle_ = other.handle_;
 #if IMGUI_INTEGRATION
     context_ = other.context_;
@@ -175,91 +175,91 @@ Window& Window::operator=(Window&& other)
     return *this;
 }
 
-GLFWwindow* Window::handle() const
+GLFWwindow* window::handle() const
 {
     return handle_;
 }
 
-ImGuiContext* Window::context() const
+ImGuiContext* window::context() const
 {
     return context_;
 }
 
-std::pair<int, int> Window::size() const
+std::pair<int, int> window::size() const
 {
     int width, height;
     glfwGetWindowSize(handle_, &width, &height);
     return {width, height};
 }
 
-bool Window::is_current() const
+bool window::is_current() const
 {
     return glfwGetCurrentContext() == handle_;
 }
 
-bool Window::should_close() const
+bool window::should_close() const
 {
     return glfwWindowShouldClose(handle_);
 }
 
-std::pair<int, int> Window::scroll_delta() const
+std::pair<int, int> window::scroll_delta() const
 {
     auto value = scroll_delta_;
     scroll_delta_ = {0, 0};
     return value;
 }
 
-void Window::swap_interval(int interval)
+void window::swap_interval(int interval)
 {
     with_context([interval]() { glfwSwapInterval(interval); });
 }
 
-void Window::swap_buffers()
+void window::swap_buffers()
 {
     glfwSwapBuffers(handle_);
 }
 
-void Window::resize(int width, int height)
+void window::resize(int width, int height)
 {
     glfwSetWindowSize(handle_, width, height);
 }
 
-void Window::close()
+void window::close()
 {
     glfwSetWindowShouldClose(handle_, true);
 }
 
-void Window::show()
+void window::show()
 {
     glfwShowWindow(handle_);
 }
 
-void Window::hide()
+void window::hide()
 {
     glfwHideWindow(handle_);
 }
 
-void Window::attention()
+void window::attention()
 {
     glfwRequestWindowAttention(handle_);
 }
 
-void Window::restore()
+void window::restore()
 {
     glfwRestoreWindow(handle_);
 }
 
-void Window::minimize()
+void window::minimize()
 {
     glfwIconifyWindow(handle_);
 }
 
-void Window::maximize()
+void window::maximize()
 {
     glfwMaximizeWindow(handle_);
 }
 
-void Window::focus()
+void window::focus()
 {
     glfwFocusWindow(handle_);
 }

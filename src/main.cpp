@@ -43,7 +43,7 @@ int main()
     IMGUI_CHECKVERSION();
 
     {
-        Window window(1200, 800, "OpenGL Demo", 4, 0);
+        window window(1200, 800, "OpenGL Demo", 4, 0);
         window.swap_interval(1); // Enable vsync
 
         window.make_current();
@@ -53,23 +53,24 @@ int main()
 
         bool close = false;
 
-        std::array<glm::vec3, 3> vertices = {
-            {
-                -0.5f,
-                -0.5f,
-                0.0f,
-            },
-            {
-                0.5f,
-                -0.5f,
-                0.0f,
-            },
-            {
-                0.0f,
-                0.5f,
-                0.0f,
-            },
-        };
+        std::array<glm::vec3, 3> vertices;
+        //  {
+        // {
+        //     -0.5f,
+        //     -0.5f,
+        //     0.0f,
+        // },
+        // {
+        //     0.5f,
+        //     -0.5f,
+        //     0.0f,
+        // },
+        // {
+        //     0.0f,
+        //     0.5f,
+        //     0.0f,
+        // },
+        // };
 
         std::array<int, 3> indices = {
             0,
@@ -80,15 +81,18 @@ int main()
         gl::shader vs(gl::shader_type::vertex);
         vs.set_source(read_file("./shaders/shader.vs"));
         vs.compile();
+        std::cout << vs.info_log() << std::endl;
 
         gl::shader fs(gl::shader_type::fragment);
         fs.set_source(read_file("./shaders/shader.fs"));
         fs.compile();
+        std::cout << fs.info_log() << std::endl;
 
         gl::program program;
         program.attach(vs);
         program.attach(fs);
         program.link();
+        std::cout << program.info_log() << std::endl;
         program.use();
 
         gl::array_buffer<glm::vec3> vbo(vertices.size(), gl::buffer_usage::static_draw);

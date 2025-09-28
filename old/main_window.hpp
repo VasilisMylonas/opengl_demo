@@ -25,7 +25,7 @@
 class MainWindow : public vcl::Window
 {
 private:
-    gl::VertexBuffer<Vertex> vbo{4, gl::buffer_usage::dynamic_draw};
+    gl::VertexBuffer<vertex> vbo{4, gl::buffer_usage::dynamic_draw};
     gl::IndexBuffer ibo{6, gl::BufferUsage::dynamic_draw};
     gl::VertexArray vao{};
     gl::Texture tex{0};
@@ -36,7 +36,7 @@ private:
     vcl::FpsCounter counter{};
     vcl::Timer timer{};
 
-    std::array<Vertex, 4> vertices = {
+    std::array<vertex, 4> vertices = {
         Vertex{
             .position = {0.5, 0.5, 0},
             .color = {1, 0, 0, 1},

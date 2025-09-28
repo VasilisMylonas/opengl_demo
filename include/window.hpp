@@ -14,7 +14,7 @@ typedef struct GLFWwindow GLFWwindow;
 typedef struct ImGuiContext ImGuiContext;
 #endif
 
-class Window
+class window
 {
 public:
     GLFWwindow* handle() const;
@@ -46,16 +46,16 @@ public:
 
     void with_context(std::function<void()> function);
 
-    Window(int width,
+    window(int width,
            int height,
            const char* title,
            int opengl_major_version = 3,
            int opengl_minor_version = 3);
-    Window(const Window&) = delete;
-    Window& operator=(const Window&) = delete;
-    Window(Window&& other);
-    Window& operator=(Window&& other);
-    virtual ~Window();
+    window(const window&) = delete;
+    window& operator=(const window&) = delete;
+    window(window&& other);
+    window& operator=(window&& other);
+    virtual ~window();
 
 private:
     GLFWwindow* handle_;
