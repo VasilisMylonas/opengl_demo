@@ -7,17 +7,20 @@ file(GLOB IMGUI_SOURCES
     third_party/imgui/backends/imgui_impl_glfw.cpp
     third_party/imgui/backends/imgui_impl_opengl3.cpp
 )
-add_executable(opengl_demo ${SOURCES} ${IMGUI_SOURCES})
 
 add_subdirectory(third_party/glm)
-target_link_libraries(opengl_demo PRIVATE glm)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(GLEW REQUIRED)
 
-target_include_directories(opengl_demo PUBLIC
+add_executable(opengl_demo ${SOURCES} ${IMGUI_SOURCES})
+
+target_include_directories(opengl_demo PRIVATE
     include
     third_party/imgui
     third_party/imgui/backends
     third_party/glm
 )
-target_link_libraries(opengl_demo PUBLIC glfw GL GLEW)
-target_compile_features(opengl_demo PUBLIC cxx_std_20)
-target_compile_options(opengl_demo PUBLIC -Wall -Wextra -Wconversion)
+target_link_libraries(opengl_demo PRIVATE glfw OpenGL::GL GLEW::GLEW glm)
+target_compile_features(opengl_demo PRIVATE cxx_std_20)
+target_compile_options(opengl_demo PRIVATE -Wall -Wextra -Wconversion)

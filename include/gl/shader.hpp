@@ -29,7 +29,6 @@ public:
 
         this->~shader();
         handle_ = other.handle_;
-        source_ = std::move(other.source_);
         other.handle_ = 0;
         return *this;
     }
@@ -37,7 +36,6 @@ public:
     shader(shader&& other)
     {
         handle_ = other.handle_;
-        source_ = std::move(other.source_);
         other.handle_ = 0;
     }
 
@@ -54,14 +52,10 @@ public:
         }
     }
 
-    std::string_view source() const
+    void set_source(const std::string& source)
     {
-        return source_;
-    }
-
-    void set_source(std::string_view source)
-    {
-        source_ = source;
+        const char* source_array[1] = {source.data()};
+        GL_CALL(glShaderSource(handle_, 1, source_array, nullptr));
     }
 
     std::string info_log() const
@@ -82,15 +76,11 @@ public:
 
     void compile()
     {
-        const char* source_array[1] = {source_.data()};
-        GLsizei length_array[1] = {static_cast<GLsizei>(source_.size())};
-        GL_CALL(glShaderSource(handle_, 1, source_array, length_array));
         GL_CALL(glCompileShader(handle_));
     }
 
 private:
     unsigned int handle_ = 0;
-    std::string source_;
 };
 
 } // namespace gl

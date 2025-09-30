@@ -80,7 +80,7 @@ public:
     std::optional<gl::uniform> u_texture;
     std::optional<gl::uniform> u_use_texture;
 
-    std::array<vertex, 13> vertices = {
+    std::array<vertex, 13> vertices{
         vertex{
             glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),

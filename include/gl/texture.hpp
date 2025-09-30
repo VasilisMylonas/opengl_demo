@@ -17,7 +17,10 @@ public:
 
     ~texture()
     {
-        glDeleteTextures(1, &handle_);
+        if (handle_ != 0)
+        {
+            glDeleteTextures(1, &handle_);
+        }
     }
 
     texture(const texture&) = delete;

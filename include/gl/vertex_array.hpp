@@ -16,7 +16,10 @@ public:
 
     ~vertex_array()
     {
-        GL_CALL(glDeleteVertexArrays(1, &handle_));
+        if (handle_ != 0)
+        {
+            GL_CALL(glDeleteVertexArrays(1, &handle_));
+        }
     }
 
     vertex_array(vertex_array&& other)
@@ -27,12 +30,14 @@ public:
 
     vertex_array& operator=(vertex_array&& other)
     {
-        if (this != &other)
+        if (this == &other)
         {
-            GL_CALL(glDeleteVertexArrays(1, &handle_));
-            handle_ = other.handle_;
-            other.handle_ = 0;
+            return *this;
         }
+
+        GL_CALL(glDeleteVertexArrays(1, &handle_));
+        handle_ = other.handle_;
+        other.handle_ = 0;
         return *this;
     }
 
