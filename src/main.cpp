@@ -11,6 +11,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <ImGuiFileDialog.h>
 #include <imgui.h>
 
 #include "gl/buffer.hpp"
@@ -80,7 +81,7 @@ public:
     std::optional<gl::uniform> u_texture;
     std::optional<gl::uniform> u_use_texture;
 
-    std::array<vertex, 13> vertices{
+    std::array<vertex, 13> vertices = {
         vertex{
             glm::vec3(-0.5f, -0.5f, -0.5f), // Bottom-Back-Left
             glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
@@ -202,7 +203,7 @@ public:
         vao_1.buffers(vbo, ibo_1, layout);
         vao_2.buffers(vbo, ibo_2, layout);
 
-        current_texture.load("./image.jpg");
+        current_texture.load("./res/missing.jpg");
     }
 
     void load_shaders()
@@ -291,8 +292,24 @@ public:
 
         if (ImGui::BeginMainMenuBar())
         {
+            if (ImGuiFileDialog::Instance()->Display("LoadImageKey"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+                    current_texture.load(filePath);
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+
             if (ImGui::BeginMenu("File"))
             {
+                if (ImGui::MenuItem("Load Image"))
+                {
+                    ImGuiFileDialog::Instance()->OpenDialog(
+                        "LoadImageKey", "Choose Image", ".jpg,.png,.bmp");
+                }
+
                 if (ImGui::MenuItem("Reload Shaders"))
                 {
                     load_shaders();
@@ -346,7 +363,7 @@ int main()
         window window(1200, 800, "OpenGL Demo", 4, 0);
         window.swap_interval(1); // Enable vsync
         window.make_current();
-        set_font("./fonts/Roboto-Regular.ttf", 18.0f);
+        set_font("./res/fonts/Roboto-Regular.ttf", 18.0f);
 
         window.show();
 
