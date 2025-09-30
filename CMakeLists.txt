@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(opengl_demo CXX)
 
+set(OpenGL_GL_PREFERENCE GLVND) # Use modern OpenGL
+
 file(GLOB SOURCES src/*.cpp)
 file(GLOB IMGUI_SOURCES
     third_party/imgui/*.cpp
     third_party/imgui/backends/imgui_impl_glfw.cpp
     third_party/imgui/backends/imgui_impl_opengl3.cpp
-)
+    )
 
 add_subdirectory(third_party/glm)
 find_package(OpenGL REQUIRED)
