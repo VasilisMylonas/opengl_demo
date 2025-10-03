@@ -71,20 +71,55 @@ public:
         ibo_size = ibo.size();
     }
 
-    void draw(std::size_t count)
+    void draw_triangles(std::size_t vertex_count)
     {
-        bind();
-        // TODO: GL_UNSIGNED_INT, does it matter or is it just for indices?
-        GL_CALL(glDrawElements(GL_TRIANGLES, static_cast<int>(count), GL_UNSIGNED_INT, nullptr));
-        unbind();
+        draw(GL_TRIANGLES, vertex_count);
     }
 
-    void draw()
+    void draw_lines(std::size_t vertex_count)
     {
-        draw(ibo_size);
+        draw(GL_LINES, vertex_count);
+    }
+
+    void draw_points(std::size_t vertex_count)
+    {
+        draw(GL_POINTS, vertex_count);
+    }
+
+    void draw_line_strip(std::size_t vertex_count)
+    {
+        draw(GL_LINE_STRIP, vertex_count);
+    }
+
+    void draw_points()
+    {
+        draw_points(ibo_size);
+    }
+
+    void draw_line_strip()
+    {
+        draw_line_strip(ibo_size);
+    }
+
+    void draw_lines()
+    {
+        draw_lines(ibo_size);
+    }
+
+    void draw_triangles()
+    {
+        draw_triangles(ibo_size);
     }
 
 private:
+    void draw(int mode, std::size_t vertex_count)
+    {
+        bind();
+        // TODO: GL_UNSIGNED_INT, does it matter or is it just for indices?
+        GL_CALL(glDrawElements(mode, static_cast<int>(vertex_count), GL_UNSIGNED_INT, nullptr));
+        unbind();
+    }
+
     void bind() const
     {
         GL_CALL(glBindVertexArray(handle_));
